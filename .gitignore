@@ -1,8 +1,40 @@
-.DS-Store
-
-
 ./data/mobile-price-classification
-
 ./data/nutrition-facts
-
 ./data/uci
+.Rproj.user
+
+# R
+*.Rdata
+*.Rhistory
+
+# RStudio
+.Rproj.user/
+.Rhistory
+.Ruserdata
+.Rproj.user/
+.Rproj
+.Rproj.user
+.Rproj.project
+.Rproj.user/*
+.Rcheck/
+
+# R environment
+.Renviron
+.Renviron.user
+
+# Session-specific files
+.Rdata
+.Rproj.user/*
+.Rproj.project
+.Rproj.user
+
+# R Markdown
+*_files/
+*_cache/
+
+# Knitr and R markdown temp files
+*.knit.md
+*.utf8.md
+
+# Shiny app
+.shiny/

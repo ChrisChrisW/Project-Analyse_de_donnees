@@ -7,13 +7,23 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
 library(ggplot2)
+library(tidyverse)
+library(knitr)
+
+# Définir un miroir CRAN
+# options(repos = c(CRAN = "https://cran.rstudio.com/"))
+# install.packages("kableExtra")
+library(kableExtra)
+
 ```
 
 # Chargement des Données
 
 ```{r load-data}
-# Lire le jeu de données
-tab <- read.csv(file = "./data/credit-card-customers/BankChurners.csv", sep = ',', dec = '.', header = TRUE)
+tab <- read.csv(file = "./data/credit-card-customers/BankChurners.csv",
+                sep = ',',
+                dec = '.',
+                header = TRUE)
 ```
 
 # Nettoyage des Données
@@ -28,6 +38,8 @@ if (sum(is.na(tab)) > 0) {
 # Supprimer les lignes avec des valeurs inconnues
 tab <- tab[complete.cases(tab), ]
 ```
+- Il n'y a pas de données NaN dans la variable tab.
+
 
 # Statistiques Sommaires
 
@@ -35,12 +47,21 @@ tab <- tab[complete.cases(tab), ]
 
 ```{r summary-quantitative}
 # Sommaire pour les variables quantitatives
-quantitative_vars <- c("CLIENTNUM", "Customer_Age", "Dependent_count", "Months_on_book", "Total_Relationship_Count",
-                       "Months_Inactive_12_mon", "Contacts_Count_12_mon", "Credit_Limit", "Total_Revolving_Bal",
-                       "Avg_Open_To_Buy", "Total_Amt_Chng_Q4_Q1", "Total_Trans_Amt", "Total_Trans_Ct",
-                       "Total_Ct_Chng_Q4_Q1", "Avg_Utilization_Ratio")
+quantitative_vars <- c("CLIENTNUM", "Customer_Age", "Dependent_count", 
+                       "Months_on_book", "Total_Relationship_Count", "Months_Inactive_12_mon",
+                       "Contacts_Count_12_mon", "Credit_Limit", "Total_Revolving_Bal",
+                       "Avg_Open_To_Buy", "Total_Amt_Chng_Q4_Q1", "Total_Trans_Amt",
+                       "Total_Trans_Ct", "Total_Ct_Chng_Q4_Q1", "Avg_Utilization_Ratio")
+
 summaries_data <- summary(tab[, quantitative_vars])
-summaries_data
+
+
+kable(summaries_data, "latex", booktabs = TRUE) %>%
+  kable_styling(
+    full_width = FALSE,
+    latex_options = c("striped", "scale_down")
+  ) %>%
+  row_spec(0, background = "#3498db")
 ```
 
 ## Variables Catégoriques
@@ -56,6 +77,14 @@ tables_data <- list(
   Card_Category = table(tab$Card_Category)
 )
 tables_data
+
+
+kable(tables_data, "latex", booktabs = TRUE) %>%
+  kable_styling(
+    full_width = FALSE,
+    latex_options = c("striped", "scale_down")
+  ) %>%
+  row_spec(0, background = "#3498db")
 ```
 
 # Visualisation des Données
