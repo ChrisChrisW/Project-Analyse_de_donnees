@@ -16,8 +16,8 @@ Les données utilisées dans cette analyse proviennent du jeu de données "Credi
 
 ## Outils Utilisés
 
-- Langage de programmation : R
-- Bibliothèques : ggplot2, skimr, VIM, outliers
+-   Langage de programmation : R
+-   Bibliothèques : ggplot2, skimr, VIM, outliers
 
 ## Objectifs de l'analyse
 
@@ -73,6 +73,7 @@ str(tab[1:21])
 ```
 
 ## Vérification de la taille et des noms de colonnes
+
 Le tableau contient n = 23 et p = 1027, avec les individus en ligne et les variables bancaires en colonne.
 
 ```{r}
@@ -165,6 +166,7 @@ for (var in quantitative_vars) {
 ```
 
 ### Analyse des valeurs possiblement abérantes sur le boxplot :
+
 ```{r, echo = FALSE}
 tables_data_to_check <- list(
   Customer_Age = table(tab$Customer_Age),
@@ -186,21 +188,21 @@ for (variable_name in names(tables_data_to_check)) {
 }
 ```
 
-### Interprétations des boxplot avec outliers : 
+### Interprétations des boxplot avec outliers :
 
-1. **Customer_Age :** Aucun problème évident n'est détecté, bien que l'on observe un léger dépassement sur le boxplot, suggérant la nécessité d'une inspection plus approfondie.
+1.  **Customer_Age :** Aucun problème évident n'est détecté, bien que l'on observe un léger dépassement sur le boxplot, suggérant la nécessité d'une inspection plus approfondie.
 
-2. **Months_on_book :** Aucun problème majeur n'est apparent, probablement lié à un ajustement de calibrage. Il est recommandé de consulter le résumé pour une confirmation supplémentaire.
+2.  **Months_on_book :** Aucun problème majeur n'est apparent, probablement lié à un ajustement de calibrage. Il est recommandé de consulter le résumé pour une confirmation supplémentaire.
 
-3. **Months_Inactive_12_mon :** Aucun problème significatif n'est observé, probablement dû à un calibrage particulier. Une vérification du résumé peut fournir des détails supplémentaires.
+3.  **Months_Inactive_12_mon :** Aucun problème significatif n'est observé, probablement dû à un calibrage particulier. Une vérification du résumé peut fournir des détails supplémentaires.
 
-4. **Contacts_Count_12_mon :** Des observations similaires sont notées, indiquant probablement un ajustement de calibrage.
+4.  **Contacts_Count_12_mon :** Des observations similaires sont notées, indiquant probablement un ajustement de calibrage.
 
-5. **Credit_Limit :** Après l'analyse du barplot, les données semblent propres et homogènes.
+5.  **Credit_Limit :** Après l'analyse du barplot, les données semblent propres et homogènes.
 
-6. **Avg_Open_To_Buy :** L'analyse du barplot révèle deux pics importants, mais la nature de la donnée ne semble pas aberrante.
+6.  **Avg_Open_To_Buy :** L'analyse du barplot révèle deux pics importants, mais la nature de la donnée ne semble pas aberrante.
 
-7. **Total_Amt_Chng_Q4_Q1 (Valeurs Aberrantes : 3.397, 3.355) :** Malgré une impression de distribution normale d'après le barplot, l'étude des quartiles identifie deux valeurs aberrantes à l'extrême droite.
+7.  **Total_Amt_Chng_Q4_Q1 (Valeurs Aberrantes : 3.397, 3.355) :** Malgré une impression de distribution normale d'après le barplot, l'étude des quartiles identifie deux valeurs aberrantes à l'extrême droite.
 
 ```{r, echo=FALSE}
 par(mfrow = c(2, 3))
@@ -209,11 +211,11 @@ qqnorm(tab$Total_Amt_Chng_Q4_Q1)
 qqline(tab$Total_Amt_Chng_Q4_Q1)
 ```
 
-8. **Total_Trans_Amt :** Aucune valeur aberrante flagrante n'est détectée après l'analyse du barplot.
+8.  **Total_Trans_Amt :** Aucune valeur aberrante flagrante n'est détectée après l'analyse du barplot.
 
 \newpage
 
-9. **Total_Trans_Ct :** Bien que le barplot suggère une distribution normale, l'étude des quartiles ne confirme pas de manière concluante la présence de valeurs aberrantes.
+9.  **Total_Trans_Ct :** Bien que le barplot suggère une distribution normale, l'étude des quartiles ne confirme pas de manière concluante la présence de valeurs aberrantes.
 
 ```{r, echo=FALSE}
 par(mfrow = c(2, 3))
@@ -226,11 +228,10 @@ qqline(tab$Total_Trans_Ct)
 
 ### Actions sur la donnée - Traitement des valeurs aberrantes :
 
-```{r, eval=FALSE}
+```{r}
 # Supprimer les lignes avec les deux valeurs (3.397, 3.355)
 tab <- tab[!(tab$Total_Amt_Chng_Q4_Q1 %in% c(3.397, 3.355)), ]
 ```
-
 
 ## Analyse des variables catégorielles :
 
@@ -254,9 +255,9 @@ for (j in 1:length(names(tables_data))) {
 
 ### Interprétations :
 
-* Les lignes contenant des valeurs 'Unknown' doivent été supprimées de l'ensemble de données, car cette catégorie ne correspond à aucune information pertinente et peut introduire des incohérences dans les analyses, affectant ainsi la qualité des résultats. Ces valeurs se retrouvent dans `Education_Level`, `Marital_Status` et `Income_Category`.
+-   Les lignes contenant des valeurs 'Unknown' doivent été supprimées de l'ensemble de données, car cette catégorie ne correspond à aucune information pertinente et peut introduire des incohérences dans les analyses, affectant ainsi la qualité des résultats. Ces valeurs se retrouvent dans `Education_Level`, `Marital_Status` et `Income_Category`.
 
-* La variable `Avg_Open_To_Buy` présente principalement des nombres entiers, mais parmi eux, un nombre décimal unique, 1438.3, a été identifié. Pour maintenir la consistance des données, il est nécessaire de convertir ce nombre décimal en un nombre entier.
+-   La variable `Avg_Open_To_Buy` présente principalement des nombres entiers, mais parmi eux, un nombre décimal unique, 1438.3, a été identifié. Pour maintenir la consistance des données, il est nécessaire de convertir ce nombre décimal en un nombre entier.
 
 ### Actions sur la donnée :
 
@@ -264,7 +265,7 @@ for (j in 1:length(names(tables_data))) {
 
 \newpage
 
-```{r, eval=FALSE}
+```{r}
 # Supprimer les lignes avec des valeurs "Unknown"
 tab <- tab[rowSums(tab == "Unknown", na.rm = TRUE) == 0, ]
 
@@ -297,23 +298,23 @@ summary(tab$Avg_Open_To_Buy)
 
 ### Variables Discrètes :
 
-1. **CLIENTNUM:** Identifiant unique du client - Discrète. Il s'agit d'un numéro d'identification unique attribué à chaque client.
+1.  **CLIENTNUM:** Identifiant unique du client - Discrète. Il s'agit d'un numéro d'identification unique attribué à chaque client.
 
-2. **Attrition_Flag:** Variable binaire indiquant si le compte est fermé (1) ou non (0) - Discrète. C'est une variable binaire avec des valeurs distinctes.
+2.  **Attrition_Flag:** Variable binaire indiquant si le compte est fermé (1) ou non (0) - Discrète. C'est une variable binaire avec des valeurs distinctes.
 
-3. **Gender:** Variable catégorielle indiquant le genre du client (M=Male, F=Female) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+3.  **Gender:** Variable catégorielle indiquant le genre du client (M=Male, F=Female) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
 
-4. **Dependent_count:** Nombre de personnes à charge - Discrète. C'est un nombre entier représentant le nombre de personnes à charge.
+4.  **Dependent_count:** Nombre de personnes à charge - Discrète. C'est un nombre entier représentant le nombre de personnes à charge.
 
-5. **Education_Level:** Niveau d'éducation du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+5.  **Education_Level:** Niveau d'éducation du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
 
-6. **Marital_Status:** État civil du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+6.  **Marital_Status:** État civil du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
 
-7. **Income_Category:** Catégorie de revenu annuel du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+7.  **Income_Category:** Catégorie de revenu annuel du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
 
-8. **Card_Category:** Type de carte de crédit (Blue, Silver, Gold, Platinum) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+8.  **Card_Category:** Type de carte de crédit (Blue, Silver, Gold, Platinum) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
 
-9. **Months_on_book:** Période de relation avec la banque - Discrète. Il s'agit d'un nombre entier représentant le nombre de mois.
+9.  **Months_on_book:** Période de relation avec la banque - Discrète. Il s'agit d'un nombre entier représentant le nombre de mois.
 
 10. **Months_Inactive_12_mon:** Nombre de mois d'inactivité au cours des 12 derniers mois - Discrète. Il s'agit d'un nombre entier.
 
@@ -321,23 +322,23 @@ summary(tab$Avg_Open_To_Buy)
 
 ### Variables Continues :
 
-1. **Customer_Age:** Âge du client en années - Continue. L'âge est une variable continue car elle peut prendre n'importe quelle valeur dans un intervalle.
+1.  **Customer_Age:** Âge du client en années - Continue. L'âge est une variable continue car elle peut prendre n'importe quelle valeur dans un intervalle.
 
-2. **Credit_Limit:** Limite de crédit sur la carte de crédit - Continue. La limite de crédit peut prendre n'importe quelle valeur dans un intervalle.
+2.  **Credit_Limit:** Limite de crédit sur la carte de crédit - Continue. La limite de crédit peut prendre n'importe quelle valeur dans un intervalle.
 
-3. **Total_Relationship_Count:** Nombre total de produits détenus par le client - Continue. Le nombre total de produits peut prendre n'importe quelle valeur dans un intervalle.
+3.  **Total_Relationship_Count:** Nombre total de produits détenus par le client - Continue. Le nombre total de produits peut prendre n'importe quelle valeur dans un intervalle.
 
-4. **Total_Revolving_Bal:** Solde total en rotation sur la carte de crédit - Continue. Le solde en rotation peut prendre n'importe quelle valeur dans un intervalle.
+4.  **Total_Revolving_Bal:** Solde total en rotation sur la carte de crédit - Continue. Le solde en rotation peut prendre n'importe quelle valeur dans un intervalle.
 
-5. **Avg_Open_To_Buy:** Montant disponible pour les achats sur la carte (moyenne des 12 derniers mois) - Continue. Cette moyenne peut prendre n'importe quelle valeur dans un intervalle.
+5.  **Avg_Open_To_Buy:** Montant disponible pour les achats sur la carte (moyenne des 12 derniers mois) - Continue. Cette moyenne peut prendre n'importe quelle valeur dans un intervalle.
 
-6. **Total_Amt_Chng_Q4_Q1:** Changement du montant des transactions (Q4 sur Q1) - Continue. Le changement du montant peut prendre n'importe quelle valeur dans un intervalle.
+6.  **Total_Amt_Chng_Q4_Q1:** Changement du montant des transactions (Q4 sur Q1) - Continue. Le changement du montant peut prendre n'importe quelle valeur dans un intervalle.
 
-7. **Total_Trans_Amt:** Montant total des transactions (12 derniers mois) - Continue. Le montant total des transactions peut prendre n'importe quelle valeur dans un intervalle.
+7.  **Total_Trans_Amt:** Montant total des transactions (12 derniers mois) - Continue. Le montant total des transactions peut prendre n'importe quelle valeur dans un intervalle.
 
-8. **Total_Trans_Ct:** Nombre total de transactions (12 derniers mois) - Continue. Le nombre total de transactions peut prendre n'importe quelle valeur dans un intervalle.
+8.  **Total_Trans_Ct:** Nombre total de transactions (12 derniers mois) - Continue. Le nombre total de transactions peut prendre n'importe quelle valeur dans un intervalle.
 
-9. **Total_Ct_Chng_Q4_Q1:** Changement du nombre de transactions (Q4 sur Q1) - Continue. Le changement du nombre de transactions peut prendre n'importe quelle valeur dans un intervalle.
+9.  **Total_Ct_Chng_Q4_Q1:** Changement du nombre de transactions (Q4 sur Q1) - Continue. Le changement du nombre de transactions peut prendre n'importe quelle valeur dans un intervalle.
 
 10. **Avg_Utilization_Ratio:** Ratio moyen d'utilisation de la carte de crédit - Continue. Le ratio moyen peut prendre n'importe quelle valeur dans un intervalle.
 
@@ -391,11 +392,14 @@ for (var in continuous_vars) {
   )
 }
 ```
+
 \newpage
 
 # ANALYSE DES STATISTIQUES DESCRIPTIVES
 
-```{r}
+Résumé sur l'ensemble des variables :
+
+```{r, echo=FALSE}
 print(skim(tab[, -c((ncol(tab) - 1):ncol(tab))]))
 ```
 
@@ -403,29 +407,26 @@ print(skim(tab[, -c((ncol(tab) - 1):ncol(tab))]))
 
 # Problématique
 
-**Problématique : Quels Facteurs et Profils de Clients Sont Associés à la Résiliation des Services de Cartes de Crédit, et Comment Peut-on les Prédire?**
+**Problématique :** Quels facteurs et profils de clients sont associés à la résiliation des services de cartes de crédit, et comment peut-on les prédire?
 
+  
 **Objectifs :**
 
-1. **Compréhension des Caractéristiques Démographiques :**
-   - **Question :** Quels sont les profils démographiques des clients résiliant leurs services de cartes de crédit?
-   - **Méthodologie :** Analyses descriptives univariées pour chaque variable démographique.
-
-2. **Étude des Relations entre les Variables :**
-   - **Question :** Existe-t-il des relations significatives entre les différentes variables démographiques et transactionnelles?
-   - **Méthodologie :** Analyses bivariées avec des tests de corrélation pour évaluer les relations.
-
-3. **Facteurs Sous-jacents à la Résiliation :**
-   - **Question :** Quels sont les facteurs sous-jacents qui contribuent le plus à la décision de résilier?
-   - **Méthodologie :** Analyses factorielles pour réduire la dimensionnalité des données.
-
-4. **Modélisation Prédictive :**
-   - **Question :** Peut-on développer un modèle de régression prédictive pour estimer la probabilité de résiliation en fonction des variables disponibles?
-   - **Méthodologie :** Utilisation de méthodes de régression.
-
-5. **Classification des Clients :**
-   - **Question :** Peut-on classer les clients en groupes distincts en fonction de leurs comportements et caractéristiques, en particulier en ce qui concerne la résiliation?
-   - **Méthodologie :** Utilisation de méthodes de classification.
+1.  **Compréhension des caractéristiques démographiques :**
+    -   **Question :** Quels sont les profils démographiques des clients résiliant leurs services de cartes de crédit?
+    -   **Méthodologie :** Analyses descriptives univariées pour chaque variable démographique.
+2.  **Étude des relations entre les variables :**
+    -   **Question :** Existe-t-il des relations significatives entre les différentes variables démographiques et transactionnelles?
+    -   **Méthodologie :** Analyses bivariées avec des tests de corrélation pour évaluer les relations.
+3.  **Facteurs sous-jacents à la résiliation :**
+    -   **Question :** Quels sont les facteurs sous-jacents qui contribuent le plus à la décision de résilier?
+    -   **Méthodologie :** Analyses factorielles pour réduire la dimensionnalité des données.
+4.  **Modélisation prédictive :**
+    -   **Question :** Peut-on développer un modèle de régression prédictive pour estimer la probabilité de résiliation en fonction des variables disponibles?
+    -   **Méthodologie :** Utilisation de méthodes de régression.
+5.  **Classification des clients :**
+    -   **Question :** Peut-on classer les clients en groupes distincts en fonction de leurs comportements et caractéristiques, en particulier en ce qui concerne la résiliation?
+    -   **Méthodologie :** Utilisation de méthodes de classification.
 
 \newpage
 
