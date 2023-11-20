@@ -150,7 +150,7 @@ Les informations extraites à l'aide de la fonction `str(tab)` nous permettent d
 
 ```{r, echo=FALSE}
 # Boîtes à moustaches pour les variables quantitatives
-par(mfrow = c(1, 3))
+par(mfrow = c(1, 5))
 
 quantitative_vars <- c("CLIENTNUM", "Customer_Age", "Dependent_count",
                        "Months_on_book", "Total_Relationship_Count",
@@ -181,7 +181,7 @@ tables_data_to_check <- list(
   Total_Ct_Chng_Q4_Q1 = table(tab$Total_Ct_Chng_Q4_Q1)
 )
 
-par(mfrow = c(2, 3))
+par(mfrow = c(3, 4))
 
 for (variable_name in names(tables_data_to_check)) {
   barplot(tables_data_to_check[[variable_name]], main=variable_name, col="lightblue")
@@ -202,6 +202,8 @@ for (variable_name in names(tables_data_to_check)) {
 
 6.  **Avg_Open_To_Buy :** L'analyse du barplot révèle deux pics importants, mais la nature de la donnée ne semble pas aberrante.
 
+\newpage
+
 7.  **Total_Amt_Chng_Q4_Q1 (Valeurs Aberrantes : 3.397, 3.355) :** Malgré une impression de distribution normale d'après le barplot, l'étude des quartiles identifie deux valeurs aberrantes à l'extrême droite.
 
 ```{r, echo=FALSE}
@@ -212,8 +214,6 @@ qqline(tab$Total_Amt_Chng_Q4_Q1)
 ```
 
 8.  **Total_Trans_Amt :** Aucune valeur aberrante flagrante n'est détectée après l'analyse du barplot.
-
-\newpage
 
 9.  **Total_Trans_Ct :** Bien que le barplot suggère une distribution normale, l'étude des quartiles ne confirme pas de manière concluante la présence de valeurs aberrantes.
 
@@ -237,7 +237,7 @@ tab <- tab[!(tab$Total_Amt_Chng_Q4_Q1 %in% c(3.397, 3.355)), ]
 
 ```{r, echo=FALSE}
 # Histogrammes pour les variables catégorielles
-par(mfrow = c(2, 3))  # Ajustez la grille selon vos préférences
+par(mfrow = c(2, 4))  # Ajustez la grille selon vos préférences
 
 tables_data <- list(
   Attrition_Flag = table(tab$Attrition_Flag),
@@ -249,7 +249,7 @@ tables_data <- list(
 )
 
 for (j in 1:length(names(tables_data))) {
-  barplot(tables_data[[j]], main = names(tables_data)[j], col = "lightblue")
+  barplot(tables_data[[j]], main = names(tables_data)[j], col = "#6CA6CD")
 }
 ```
 
@@ -261,20 +261,11 @@ for (j in 1:length(names(tables_data))) {
 
 ### Actions sur la donnée :
 
-#### Traitement des valeurs inconnues :
-
-\newpage
+**Traitement des valeurs inconnues :**
 
 ```{r}
 # Supprimer les lignes avec des valeurs "Unknown"
 tab <- tab[rowSums(tab == "Unknown", na.rm = TRUE) == 0, ]
-
-# Vérifier les dimensions du dataset après la suppression
-tables_data_after_cleaning <- lapply(
-  c("Attrition_Flag", "Gender", "Education_Level", 
-    "Marital_Status", "Income_Category", "Card_Category"),
-                                     function(x) table(tab[[x]]))
-list(tables_data_after_cleaning)
 ```
 
 #### Correction d'une valeur décimale à entier :
@@ -296,67 +287,67 @@ summary(tab$Avg_Open_To_Buy)
 
 ## Significations :
 
-### Variables Discrètes :
+### Variables discrètes :
 
-1.  **CLIENTNUM:** Identifiant unique du client - Discrète. Il s'agit d'un numéro d'identification unique attribué à chaque client.
+1. **CLIENTNUM:** Identifiant unique du client - Discrète. Il s'agit d'un numéro d'identification unique attribué à chaque client. Bien que ce soit une série de nombres, il est traité comme une variable discrète en raison de son caractère distinct et non mesurable dans un continuum.
 
-2.  **Attrition_Flag:** Variable binaire indiquant si le compte est fermé (1) ou non (0) - Discrète. C'est une variable binaire avec des valeurs distinctes.
+2. **Attrition_Flag:** Variable binaire indiquant si le compte est fermé (1) ou non (0) - Discrète. C'est une variable binaire avec des valeurs distinctes, représentant deux états possibles : fermé ou non fermé.
 
-3.  **Gender:** Variable catégorielle indiquant le genre du client (M=Male, F=Female) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+3. **Gender:** Variable catégorielle indiquant le genre du client (M=Male, F=Female) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes, représentant deux genres possibles.
 
-4.  **Dependent_count:** Nombre de personnes à charge - Discrète. C'est un nombre entier représentant le nombre de personnes à charge.
+4. **Dependent_count:** Nombre de personnes à charge - Discrète. Il s'agit d'un nombre entier représentant le nombre de personnes à charge. Comme il s'agit d'une quantité discrète et non continue, il est classé comme variable discrète.
 
-5.  **Education_Level:** Niveau d'éducation du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+5. **Education_Level:** Niveau d'éducation du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes, représentant différents niveaux d'éducation.
 
-6.  **Marital_Status:** État civil du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+6. **Marital_Status:** État civil du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes, représentant différents états civils.
 
-7.  **Income_Category:** Catégorie de revenu annuel du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+7. **Income_Category:** Catégorie de revenu annuel du titulaire du compte - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes, représentant différentes tranches de revenu.
 
-8.  **Card_Category:** Type de carte de crédit (Blue, Silver, Gold, Platinum) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes.
+8. **Card_Category:** Type de carte de crédit (Blue, Silver, Gold, Platinum) - Discrète. Il s'agit d'une variable catégorielle avec des catégories distinctes, représentant différents types de cartes de crédit.
 
-9.  **Months_on_book:** Période de relation avec la banque - Discrète. Il s'agit d'un nombre entier représentant le nombre de mois.
+9. **Months_on_book:** Période de relation avec la banque - Discrète. Il s'agit d'un nombre entier représentant le nombre de mois. Bien que les mois soient des unités discrètes, cette variable est considérée comme continue car elle représente une durée dans un continuum temporel.
 
-10. **Months_Inactive_12_mon:** Nombre de mois d'inactivité au cours des 12 derniers mois - Discrète. Il s'agit d'un nombre entier.
+10. **Months_Inactive_12_mon:** Nombre de mois d'inactivité au cours des 12 derniers mois - Discrète. Il s'agit d'un nombre entier représentant le nombre de mois d'inactivité au cours d'une période définie.
 
-11. **Contacts_Count_12_mon:** Nombre de contacts au cours des 12 derniers mois - Discrète. Il s'agit d'un nombre entier.
+11. **Contacts_Count_12_mon:** Nombre de contacts au cours des 12 derniers mois - Discrète. Il s'agit d'un nombre entier représentant le nombre de contacts au cours d'une période définie.
 
-### Variables Continues :
+### Variables continues :
 
-1.  **Customer_Age:** Âge du client en années - Continue. L'âge est une variable continue car elle peut prendre n'importe quelle valeur dans un intervalle.
+1. **Customer_Age:** Âge du client en années - Continue. L'âge est une variable continue car elle peut prendre n'importe quelle valeur dans un intervalle. Bien que dans ce cas les âges soient fournis en nombres entiers, l'âge lui-même est une mesure continue.
 
-2.  **Credit_Limit:** Limite de crédit sur la carte de crédit - Continue. La limite de crédit peut prendre n'importe quelle valeur dans un intervalle.
+2. **Credit_Limit:** Limite de crédit sur la carte de crédit - Continue. La limite de crédit peut prendre n'importe quelle valeur dans un intervalle, la rendant ainsi continue.
 
-3.  **Total_Relationship_Count:** Nombre total de produits détenus par le client - Continue. Le nombre total de produits peut prendre n'importe quelle valeur dans un intervalle.
+3. **Total_Relationship_Count:** Nombre total de produits détenus par le client - Continue. Le nombre total de produits peut prendre n'importe quelle valeur dans un intervalle, ce qui en fait une variable continue.
 
-4.  **Total_Revolving_Bal:** Solde total en rotation sur la carte de crédit - Continue. Le solde en rotation peut prendre n'importe quelle valeur dans un intervalle.
+4. **Total_Revolving_Bal:** Solde total en rotation sur la carte de crédit - Continue. Le solde en rotation peut prendre n'importe quelle valeur dans un intervalle, le classant ainsi comme variable continue.
 
-5.  **Avg_Open_To_Buy:** Montant disponible pour les achats sur la carte (moyenne des 12 derniers mois) - Continue. Cette moyenne peut prendre n'importe quelle valeur dans un intervalle.
+5. **Avg_Open_To_Buy:** Montant disponible pour les achats sur la carte (moyenne des 12 derniers mois) - Continue. Cette moyenne peut prendre n'importe quelle valeur dans un intervalle, la rendant continue.
 
-6.  **Total_Amt_Chng_Q4_Q1:** Changement du montant des transactions (Q4 sur Q1) - Continue. Le changement du montant peut prendre n'importe quelle valeur dans un intervalle.
+6. **Total_Amt_Chng_Q4_Q1:** Changement du montant des transactions (Q4 sur Q1) - Continue. Le changement du montant peut prendre n'importe quelle valeur dans un intervalle, classant cette variable comme continue.
 
-7.  **Total_Trans_Amt:** Montant total des transactions (12 derniers mois) - Continue. Le montant total des transactions peut prendre n'importe quelle valeur dans un intervalle.
+7. **Total_Trans_Amt:** Montant total des transactions (12 derniers mois) - Continue. Le montant total des transactions peut prendre n'importe quelle valeur dans un intervalle, la rendant continue.
 
-8.  **Total_Trans_Ct:** Nombre total de transactions (12 derniers mois) - Continue. Le nombre total de transactions peut prendre n'importe quelle valeur dans un intervalle.
+8. **Total_Trans_Ct:** Nombre total de transactions (12 derniers mois) - Continue. Le nombre total de transactions peut prendre n'importe quelle valeur dans un intervalle, le classant ainsi comme variable continue.
 
-9.  **Total_Ct_Chng_Q4_Q1:** Changement du nombre de transactions (Q4 sur Q1) - Continue. Le changement du nombre de transactions peut prendre n'importe quelle valeur dans un intervalle.
+9. **Total_Ct_Chng_Q4_Q1:** Changement du nombre de transactions (Q4 sur Q1) - Continue. Le changement du nombre de transactions peut prendre n'importe quelle valeur dans un intervalle, rendant cette variable continue.
 
-10. **Avg_Utilization_Ratio:** Ratio moyen d'utilisation de la carte de crédit - Continue. Le ratio moyen peut prendre n'importe quelle valeur dans un intervalle.
+10. **Avg_Utilization_Ratio:** Ratio moyen d'utilisation de la carte de crédit - Continue. Le ratio moyen peut prendre n'importe quelle valeur dans un intervalle, le classant comme variable continue.
 
 ## Visualisation :
 
 ### Visualisations pour les variables discrètes
 
-Nous n'avons pas besoin de plot le "CLIENTNUM" qui correspond juste à l'identifiant du client.
+Nous n'avons pas besoin de plot le `CLIENTNUM` qui correspond juste à l'identifiant du client.
 
 ```{r, echo=FALSE}
 # Variables discretes
-discrete_vars <- c("Attrition_Flag", "Gender",
-                   "Dependent_count","Education_Level", "Marital_Status", 
-                   "Income_Category", "Card_Category", "Months_on_book",
-                   "Months_Inactive_12_mon", "Contacts_Count_12_mon")
+discrete_vars <- c("Attrition_Flag", "Gender", "Dependent_count",
+                   "Education_Level", "Marital_Status", "Income_Category", 
+                   "Card_Category", "Months_on_book", "Months_Inactive_12_mon", 
+                   "Contacts_Count_12_mon")
 
 # Définir la disposition de la fenêtre graphique
-par(mfrow = c(2, 3))
+par(mfrow = c(2, 4))
 
 # Boucle pour créer les graphiques à barres
 for (var in discrete_vars) {
@@ -380,24 +371,20 @@ for (var in discrete_vars) {
 
 ```{r, echo=FALSE}
 # Variables continues
+
 continuous_vars <- c("Customer_Age", "Credit_Limit", "Total_Relationship_Count",
                      "Total_Revolving_Bal", "Avg_Open_To_Buy", "Total_Amt_Chng_Q4_Q1",
                      "Total_Trans_Amt", "Total_Trans_Ct", "Total_Ct_Chng_Q4_Q1",
                      "Avg_Utilization_Ratio")
 
 # Définir la disposition de la fenêtre graphique
-par(mfrow = c(2, 3))
+par(mfrow = c(2, 4))
 
 # Boucle pour créer les histogrammes
 for (var in continuous_vars) {
-  # Créer l'histogramme
-  hist_data <- hist(tab[[var]], breaks = seq(min(tab[[var]]), max(tab[[var]]) + 5, by = 5),
-                    plot = FALSE)
-  
-  # Tracer l'histogramme avec barplot pour personnaliser l'apparence
-  barplot(hist_data$counts, names.arg = hist_data$breaks[-length(hist_data$breaks)],
-          col = "blue", border = "black", space = 0, main = paste("Histogram for", var),
-          xlab = var, ylab = "Frequency")
+  # Ajuster le nombre de bins
+  hist(tab[[var]], breaks = 30, col = "#87CEEB", border = "black",
+       main = paste("Histogram for", var), xlab = var, ylab = "Frequency")
 }
 ```
 
