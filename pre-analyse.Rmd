@@ -346,25 +346,32 @@ summary(tab$Avg_Open_To_Buy)
 
 ### Visualisations pour les variables discrètes
 
+Nous n'avons pas besoin de plot le "CLIENTNUM" qui correspond juste à l'identifiant du client.
+
 ```{r, echo=FALSE}
 # Variables discretes
-discrete_vars <- c("CLIENTNUM", "Attrition_Flag", "Gender",
+discrete_vars <- c("Attrition_Flag", "Gender",
                    "Dependent_count","Education_Level", "Marital_Status", 
                    "Income_Category", "Card_Category", "Months_on_book",
                    "Months_Inactive_12_mon", "Contacts_Count_12_mon")
 
+# Définir la disposition de la fenêtre graphique
 par(mfrow = c(2, 3))
 
-# Visualisations pour les variables discrètes
+# Boucle pour créer les graphiques à barres
 for (var in discrete_vars) {
-  print(
-    ggplot(tab, aes(x = as.factor(get(var)))) +
-      geom_bar() +
-      labs(title = paste("Bar Plot for", var),
-           x = var, y = "Count") +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  )
+  # Table de fréquence
+  freq_table <- table(tab[[var]])
+  
+  # Noms de la table
+  bar_names <- names(freq_table)
+  
+  # Compter les occurrences
+  bar_counts <- as.vector(freq_table)
+  
+  # Créer le graphique à barres
+  barplot(bar_counts, names.arg = bar_names, main = paste("Bar Plot for", var),
+          xlab = var, ylab = "Count", col = "steelblue", cex.names = 0.8)
 }
 
 ```
@@ -378,18 +385,19 @@ continuous_vars <- c("Customer_Age", "Credit_Limit", "Total_Relationship_Count",
                      "Total_Trans_Amt", "Total_Trans_Ct", "Total_Ct_Chng_Q4_Q1",
                      "Avg_Utilization_Ratio")
 
-
+# Définir la disposition de la fenêtre graphique
 par(mfrow = c(2, 3))
 
-# Visualisations pour les variables continues
+# Boucle pour créer les histogrammes
 for (var in continuous_vars) {
-  print(
-    ggplot(tab, aes(x = get(var))) +
-      geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
-      labs(title = paste("Histogram for", var),
-           x = var, y = "Frequency") +
-      theme_minimal()
-  )
+  # Créer l'histogramme
+  hist_data <- hist(tab[[var]], breaks = seq(min(tab[[var]]), max(tab[[var]]) + 5, by = 5),
+                    plot = FALSE)
+  
+  # Tracer l'histogramme avec barplot pour personnaliser l'apparence
+  barplot(hist_data$counts, names.arg = hist_data$breaks[-length(hist_data$breaks)],
+          col = "blue", border = "black", space = 0, main = paste("Histogram for", var),
+          xlab = var, ylab = "Frequency")
 }
 ```
 
