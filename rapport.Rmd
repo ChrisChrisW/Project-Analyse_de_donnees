@@ -1,31 +1,136 @@
 ---
-title: "Analyse des Clients de Cartes de Crédit"
-output:
-  pdf_document
+title: "Analyse des Résiliations de Cartes de Crédit"
+output: 
+  pdf_document:
+    latex_engine: xelatex
 ---
 
-La problématique que vous avez présentée est centrée sur l'identification des facteurs et des profils de clients associés à la résiliation des services de cartes de crédit, ainsi que sur la prédiction de cette résiliation. Voici une approche générale pour répondre à cette problématique :
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-**1. Compréhension des Caractéristiques Démographiques (Objectif 1) :**
-   - Analysez les profils démographiques des clients qui résilient leurs services de cartes de crédit. Cela pourrait inclure des variables telles que l'âge, le genre, le nombre de personnes à charge, le niveau d'éducation, l'état matrimonial et la catégorie de revenu.
-   - Utilisez des analyses descriptives univariées pour chaque variable démographique afin de comprendre la distribution des clients résiliants.
+# Chargement des données
 
-**2. Étude des Relations entre les Variables (Objectif 2) :**
-   - Explorez les relations entre différentes variables démographiques et transactionnelles. Utilisez des analyses bivariées avec des tests de corrélation pour évaluer les relations potentielles.
-   - Identifiez les variables qui ont une influence significative sur la résiliation des services de cartes de crédit.
+```{r, message=FALSE}
+library(ggplot2)
+library(skimr)
+library(VIM)
+library(outliers)
+library(psych)
 
-**3. Facteurs Sous-jacents à la Résiliation (Objectif 3) :**
-   - Utilisez des analyses factorielles pour réduire la dimensionnalité des données et identifier les facteurs sous-jacents qui contribuent le plus à la décision de résilier.
-   - Examinez les charges factorielles pour comprendre quelles variables sont fortement associées à chaque facteur.
+# Chargement des données
+tab <- read.csv(file = "./data/credit-card-customers/cleaned_data.csv", sep = ',', dec = '.', header = TRUE)
+```
 
-**4. Modélisation Prédictive (Objectif 4) :**
-   - Développez un modèle de régression prédictive pour estimer la probabilité de résiliation en fonction des variables disponibles.
-   - Utilisez des méthodes de régression logistique ou d'autres modèles de classification pour prédire la résiliation en se basant sur les caractéristiques démographiques et transactionnelles.
+# Objectif 1: Compréhension des caractéristiques démographiques
 
-**5. Classification des Clients (Objectif 5) :**
-   - Utilisez des méthodes de classification, comme k-means, pour regrouper les clients en segments distincts en fonction de leurs comportements et caractéristiques.
-   - Analysez les caractéristiques de chaque groupe pour comprendre les profils de clients associés à la résiliation.
+```{r}
+# Profils démographiques des clients résiliant leurs services de cartes de crédit
+par(mfrow = c(2, 3))
 
-**6. Validation du Modèle :**
-   - Divisez les données en ensembles d'entraînement et de test pour évaluer les performances du modèle.
-   - Utilisez des mesures d'évaluation appropriées, telles que la précision, le rappel et la courbe ROC, pour évaluer la capacité prédictive du modèle.
+# Analyse univariée pour chaque variable démographique
+for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
+  barplot(table(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
+}
+```
+
+# Objectif 2: Étude des relations entre les variables
+
+```{r}
+# Matrice de corrélation pour les variables démographiques et transactionnelles
+correlation_matrix <- cor(tab[, c("Customer_Age", "Dependent_count", "Credit_Limit", "Total_Trans_Amt", "Total_Trans_Ct")])
+
+# Affichage de la matrice de corrélation
+print(correlation_matrix)
+
+# Test de corrélation entre variables
+cor.test(tab$Customer_Age, tab$Total_Trans_Amt)
+```
+
+# Objectif 3: Facteurs sous-jacents à la résiliation
+
+```{r}
+# Sélection des variables pertinentes pour l'analyse factorielle
+selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt")
+
+# Résumé statistique des colonnes sélectionnées
+summary(tab[, selected_vars])
+
+# Analyse factorielle pour réduire la dimensionnalité des données
+nb_facteurs <- 2  # Nombre de facteurs à extraire
+fact_model <- fa(tab[, selected_vars], nfactors = nb_facteurs, rotate = "varimax")
+
+# Affichage des résultats de l'analyse factorielle
+print(fact_model)
+```
+
+# Objectif 4: Modélisation prédictive
+
+```{r}
+# Transformation de la variable Attrition_Flag en binaire
+tab$Attrition_Flag <- ifelse(tab$Attrition_Flag == "Attrited Customer", 1, 0)
+
+# Modèle de régression logistique, prédictive pour estimer la probabilité de résiliation
+model <- glm(Attrition_Flag ~ Customer_Age + Dependent_count + Credit_Limit + Total_Trans_Amt + Total_Trans_Ct, data = tab, family = "binomial")
+
+# Affichage des résultats du modèle
+summary(model)
+```
+
+# Objectif 5: Classification des clients
+
+```{r}
+# Utilisation de méthodes de classification (par exemple, k-means)
+set.seed(123)  # Pour la reproductibilité
+num_clusters <- 3
+cluster_vars <- tab[, c("Customer_Age", "Credit_Limit", "Total_Trans_Amt", "Total_Trans_Ct")]
+
+# Algorithme de k-means
+kmeans_model <- kmeans(cluster_vars, centers = num_clusters, nstart = 20)
+
+# Affichage des résultats de la classification
+print(kmeans_model)
+
+# Visualisation en 2D des clusters créés par k-means
+library(cluster)
+par(mfrow = c(1, 1))
+clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+```
+
+
+
+
+
+
+# TODO : 
+### Objectif 1: Compréhension des caractéristiques démographiques
+
+#### Profils démographiques des clients résiliant leurs services de cartes de crédit
+L'analyse univariée des caractéristiques démographiques des clients permet de visualiser la distribution des résiliations pour chaque variable. Voici quelques observations :
+
+- **Customer_Age :** La répartition des résiliations semble similaire pour différentes tranches d'âge.
+- **Gender :** Les résiliations semblent réparties de manière équivalente entre les genres.
+- **Dependent_count :** La plupart des clients ayant résilié ont un faible nombre de personnes à charge.
+- **Education_Level :** Les clients ayant résilié proviennent de divers niveaux d'éducation, mais les diplômés universitaires semblent être légèrement plus nombreux.
+- **Marital_Status :** Les clients célibataires semblent plus enclins à résilier.
+- **Income_Category :** Les résiliations sont plus fréquentes chez les clients ayant des revenus modérés.
+
+### Objectif 2: Étude des relations entre les variables
+
+La matrice de corrélation montre les relations linéaires entre les variables démographiques et transactionnelles. Par exemple, nous pouvons observer une corrélation négative entre l'âge du client et le total des transactions effectuées.
+
+La corrélation entre l'âge du client et le montant total des transactions est statistiquement significative (p-value < 0.05), ce qui suggère une relation linéaire négative.
+
+### Objectif 3: Facteurs sous-jacents à la résiliation
+
+L'analyse factorielle avec rotation varimax sur les variables sélectionnées (Customer_Age, Credit_Limit, Total_Trans_Amt) réduit la dimensionnalité des données. Les résultats montrent les facteurs sous-jacents aux caractéristiques sélectionnées, mais il est essentiel d'interpréter ces facteurs en fonction du contexte.
+
+### Objectif 4: Modélisation prédictive
+
+Le modèle de régression logistique est utilisé pour estimer la probabilité de résiliation en fonction des variables disponibles. Les coefficients du modèle indiquent l'impact de chaque variable sur la probabilité de résiliation. Une analyse plus approfondie des résultats, notamment des p-values, est nécessaire pour évaluer la significativité des coefficients.
+
+### Objectif 5: Classification des clients
+
+L'utilisation de l'algorithme de classification k-means regroupe les clients en clusters distincts en fonction de leurs caractéristiques. La visualisation en 2D des clusters montre comment les clients sont regroupés en fonction de l'âge, du montant de crédit, du total des transactions, et du total des transactions effectuées. Cette classification peut aider à identifier des segments de clients ayant des comportements similaires.
+
+Ces résultats fournissent une base pour mieux comprendre les caractéristiques des clients associées à la résiliation des services de cartes de crédit et pour développer des stratégies visant à réduire la résiliation. Il est recommandé d'approfondir l'analyse, d'évaluer la performance du modèle prédictif sur un ensemble de test distinct et de vérifier la stabilité des clusters au fil du temps.

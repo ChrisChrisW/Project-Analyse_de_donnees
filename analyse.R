@@ -11,12 +11,13 @@ if (!require("ggplot2")) install.packages("ggplot2")
 if (!require("skimr")) install.packages("skimr")
 if (!require("VIM")) install.packages("VIM")
 if (!require("outliers")) install.packages("outliers")
-
+if (!require("psych")) install.packages("psych")
 # Chargement des bibliothèques
 library("ggplot2")    # Bibliothèque pour les graphiques
 library(skimr)        # Bibliothèque pour les statistiques descriptives
 library(VIM)          # Bibliothèque pour la gestion des données manquantes
 library(outliers)     # Bibliothèque pour la détection des valeurs aberrantes
+library(psych)        # Bibliothèque pour les analyses psychologiques et statistiques
 
 # Chargement des Données
 tab <- read.csv(file="./data/credit-card-customers/cleaned_data.csv",
@@ -50,7 +51,6 @@ cor.test(tab$Customer_Age, tab$Total_Trans_Amt)
 # ----------------------------------------------------------------
 # Objectif 3: Facteurs sous-jacents à la résiliation
 # ----------------------------------------------------------------
-
 # Sélection des variables pertinentes pour l'analyse factorielle
 selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt")
 
@@ -70,7 +70,6 @@ print(fact_model)
 # ----------------------------------------------------------------
 # Objectif 4: Modélisation prédictive
 # ----------------------------------------------------------------
-
 # Transformation de la variable Attrition_Flag en binaire
 tab$Attrition_Flag <- ifelse(tab$Attrition_Flag == "Attrited Customer", 1, 0)
 
