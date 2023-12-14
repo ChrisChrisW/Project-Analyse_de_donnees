@@ -4,125 +4,28 @@ output:
   pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
-library(ggplot2)
-library(tidyverse)
-library(knitr)
+La problématique que vous avez présentée est centrée sur l'identification des facteurs et des profils de clients associés à la résiliation des services de cartes de crédit, ainsi que sur la prédiction de cette résiliation. Voici une approche générale pour répondre à cette problématique :
 
-# Définir un miroir CRAN
-# options(repos = c(CRAN = "https://cran.rstudio.com/"))
-# install.packages("kableExtra")
-library(kableExtra)
+**1. Compréhension des Caractéristiques Démographiques (Objectif 1) :**
+   - Analysez les profils démographiques des clients qui résilient leurs services de cartes de crédit. Cela pourrait inclure des variables telles que l'âge, le genre, le nombre de personnes à charge, le niveau d'éducation, l'état matrimonial et la catégorie de revenu.
+   - Utilisez des analyses descriptives univariées pour chaque variable démographique afin de comprendre la distribution des clients résiliants.
 
-```
+**2. Étude des Relations entre les Variables (Objectif 2) :**
+   - Explorez les relations entre différentes variables démographiques et transactionnelles. Utilisez des analyses bivariées avec des tests de corrélation pour évaluer les relations potentielles.
+   - Identifiez les variables qui ont une influence significative sur la résiliation des services de cartes de crédit.
 
-# Chargement des Données
+**3. Facteurs Sous-jacents à la Résiliation (Objectif 3) :**
+   - Utilisez des analyses factorielles pour réduire la dimensionnalité des données et identifier les facteurs sous-jacents qui contribuent le plus à la décision de résilier.
+   - Examinez les charges factorielles pour comprendre quelles variables sont fortement associées à chaque facteur.
 
-```{r load-data}
-tab <- read.csv(file = "./data/credit-card-customers/BankChurners.csv",
-                sep = ',',
-                dec = '.',
-                header = TRUE)
-```
+**4. Modélisation Prédictive (Objectif 4) :**
+   - Développez un modèle de régression prédictive pour estimer la probabilité de résiliation en fonction des variables disponibles.
+   - Utilisez des méthodes de régression logistique ou d'autres modèles de classification pour prédire la résiliation en se basant sur les caractéristiques démographiques et transactionnelles.
 
-# Nettoyage des Données
+**5. Classification des Clients (Objectif 5) :**
+   - Utilisez des méthodes de classification, comme k-means, pour regrouper les clients en segments distincts en fonction de leurs comportements et caractéristiques.
+   - Analysez les caractéristiques de chaque groupe pour comprendre les profils de clients associés à la résiliation.
 
-```{r data-cleaning}
-# Vérifier les valeurs NaN
-if (sum(is.na(tab)) > 0) {
-  print(tab[is.na(tab)])
-  stop("Des valeurs NaN ont été détectées. Veuillez nettoyer les données avant de continuer.")
-}
-
-# Supprimer les lignes avec des valeurs inconnues
-tab <- tab[complete.cases(tab), ]
-```
-- Il n'y a pas de données NaN dans la variable tab.
-
-
-# Statistiques Sommaires
-
-## Variables Quantitatives
-
-```{r summary-quantitative}
-# Sommaire pour les variables quantitatives
-quantitative_vars <- c("CLIENTNUM", "Customer_Age", "Dependent_count", 
-                       "Months_on_book", "Total_Relationship_Count", "Months_Inactive_12_mon",
-                       "Contacts_Count_12_mon", "Credit_Limit", "Total_Revolving_Bal",
-                       "Avg_Open_To_Buy", "Total_Amt_Chng_Q4_Q1", "Total_Trans_Amt",
-                       "Total_Trans_Ct", "Total_Ct_Chng_Q4_Q1", "Avg_Utilization_Ratio")
-
-summaries_data <- summary(tab[, quantitative_vars])
-
-
-kable(summaries_data, "latex", booktabs = TRUE) %>%
-  kable_styling(
-    full_width = FALSE,
-    latex_options = c("striped", "scale_down")
-  ) %>%
-  row_spec(0, background = "#3498db")
-```
-
-## Variables Catégoriques
-
-```{r summary-categorical}
-# Tableau de fréquence pour les variables catégoriques
-tables_data <- list(
-  Attrition_Flag = table(tab$Attrition_Flag),
-  Gender = table(tab$Gender),
-  Education_Level = table(tab$Education_Level),
-  Marital_Status = table(tab$Marital_Status),
-  Income_Category = table(tab$Income_Category),
-  Card_Category = table(tab$Card_Category)
-)
-tables_data
-
-
-kable(tables_data, "latex", booktabs = TRUE) %>%
-  kable_styling(
-    full_width = FALSE,
-    latex_options = c("striped", "scale_down")
-  ) %>%
-  row_spec(0, background = "#3498db")
-```
-
-# Visualisation des Données
-
-## Boxplots pour les Variables Quantitatives
-
-```{r boxplots}
-# Boxplots pour les Variables Quantitatives
-par(mfrow = c(3, 3))  # Ajustez la grille selon vos préférences
-
-for (i in 1:length(quantitative_vars)) {
-  boxplot(tab[, quantitative_vars[i]], main = quantitative_vars[i], col = "skyblue", border = "black")
-}
-```
-
-## Histogrammes pour les Variables Catégoriques
-
-```{r histograms}
-# Histogrammes pour les Variables Catégoriques
-par(mfrow = c(2, 3))  # Ajustez la grille selon vos préférences
-
-for (j in 1:length(names(tables_data))) {
-  barplot(tables_data[[j]], main = names(tables_data)[j], col = "lightblue")
-}
-```
-
-# Vérification et Gestion des Valeurs Aberrantes
-
-```{r outliers}
-# Vérification des valeurs aberrantes
-quantitative_vars_to_check <- c("Credit_Limit", "Avg_Open_To_Buy", "Total_Amt_Chng_Q4_Q1", "Total_Trans_Ct", "Total_Ct_Chng_Q4_Q1")
-
-for (var in quantitative_vars_to_check) {
-  boxplot(tab[, var], main = var, col = "skyblue", border = "black")
-  # Ajouter le code pour gérer les valeurs aberrantes si nécessaire
-}
-```
-
-# Conclusion
-
-Ce document fournit une analyse initiale du jeu de données des clients de cartes de crédit. Une exploration et une analyse plus approfondies peuvent être nécessaires en fonction des objectifs spécifiques de votre projet.
+**6. Validation du Modèle :**
+   - Divisez les données en ensembles d'entraînement et de test pour évaluer les performances du modèle.
+   - Utilisez des mesures d'évaluation appropriées, telles que la précision, le rappel et la courbe ROC, pour évaluer la capacité prédictive du modèle.

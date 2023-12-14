@@ -256,3 +256,9 @@ skim(tab[, -c((ncol(tab) - 1):ncol(tab))])
 
 # A réfléchir : Supprimer les lignes avec "Attrited Customer" de tab qui correspond aux comptes résiliés
 # tab <- tab[tab$Attrition_Flag != "Attrited Customer", ]
+
+
+# ----------------------------------------------------------------
+# EXPORTATION DES DONNÉES NETTOYÉES EN CSV
+# ----------------------------------------------------------------
+write.csv(tab, file = "./data/credit-card-customers/cleaned_data.csv", row.names = FALSE)
