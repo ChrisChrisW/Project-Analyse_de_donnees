@@ -176,6 +176,17 @@ Les résultats de notre analyse démontrent qu'il existe des relations statistiq
 
 # Objectif 3: Facteurs sous-jacents à la résiliation
 
+## Choix des variables
+Le choix des variables pour l'analyse factorielle a été guidé par l'objectif de réduire la dimensionnalité des données tout en capturant les aspects les plus significatifs liés à la résiliation des services de cartes de crédit. Les variables sélectionnées sont les suivantes :
+
+- **Customer_Age :** L'âge peut être un indicateur important du comportement financier et de la stabilité dans la relation avec la banque. Les différences générationnelles peuvent également jouer un rôle dans la résiliation.
+
+- **Credit_Limit :** La capacité de crédit d'un client est un aspect crucial de sa relation avec la banque. Des limites de crédit plus élevées pourraient être associées à une stabilité financière.
+
+- **Total_Trans_Amt :** Les comportements de transaction, en particulier les montants dépensés, peuvent être des indicateurs importants du niveau d'engagement du client avec ses services financiers.
+
+- **Attrition_Flag :**  Il est essentiel d'inclure la variable cible dans l'analyse pour comprendre comment les autres variables sont liées à la résiliation.
+
 ## Analyse Factorielle - Interprétation des Facteurs (MR1 et MR2)
 
 Lors d'une analyse factorielle, les termes MR1 et MR2 font référence aux deux facteurs extraits. Ces termes sont souvent utilisés pour désigner les scores factoriels attribués à chaque observation (ici, chaque client) sur les deux facteurs respectifs. Chaque score factoriel est une combinaison linéaire des variables d'origine, pondérées par les charges factorielles. En d'autres termes, MR1 et MR2 représentent les scores attribués à chaque client sur les facteurs 1 et 2, respectivement.
