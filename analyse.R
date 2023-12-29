@@ -13,6 +13,7 @@ if (!require("VIM")) install.packages("VIM")
 if (!require("outliers")) install.packages("outliers")
 if (!require("psych")) install.packages("psych")
 if (!require("corrplot")) install.packages("corrplot")
+if (!require("cluster")) install.packages("cluster")
 
 # Chargement des bibliothèques
 library("ggplot2")    # Bibliothèque pour les graphiques
@@ -21,6 +22,7 @@ library(VIM)          # Bibliothèque pour la gestion des données manquantes
 library(outliers)     # Bibliothèque pour la détection des valeurs aberrantes
 library(psych)        # Bibliothèque pour les analyses psychologiques et statistiques
 library(corrplot)     # Bibliothèque pour les graphiques de matrices de corrélation
+library(cluster)      # Bibliothèque pour les analyses de regroupement (clustering)
 
 # Chargement des Données
 tab <- read.csv(file="./data/credit-card-customers/cleaned_data.csv",
@@ -135,7 +137,8 @@ print(kmeans_model)
 # Visualisation des résultats de la classification
 # ----------------------------------------------------------------
 # Visualisation en 2D des clusters créés par k-means
-library(cluster)
 par(mfrow = c(1, 1))
-
 clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+
+# Sans les points de données
+clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0, main="Clusters", col.p="transparent")

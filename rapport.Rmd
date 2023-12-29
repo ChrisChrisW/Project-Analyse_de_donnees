@@ -6,7 +6,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
 ```
 
 # Chargement des données
@@ -18,6 +18,7 @@ library(VIM)
 library(outliers)
 library(psych)
 library(corrplot)
+library(cluster)
 
 # Chargement des données
 tab <- read.csv(file = "./data/credit-card-customers/cleaned_data.csv", sep = ',', dec = '.', header = TRUE)
@@ -35,9 +36,12 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
 }
 ```
 
+
+
+
 # Objectif 2: Étude des relations entre les variables
 
-## Choix des variables
+## Choix des variables :
 
 1. **Représentativité des domaines clés :**
    - **Customer_Age :** L'âge du client est souvent un facteur important dans de nombreuses analyses démographiques.
@@ -52,7 +56,7 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
 3. **Équilibre entre démographie et comportement financier :**
    - L'inclusion de variables démographiques (comme l'âge et le nombre de personnes à charge) en combinaison avec des variables transactionnelles permet d'obtenir une perspective équilibrée entre les caractéristiques personnelles et le comportement financier du client.
 
-## Matrice de corrélation
+## Matrice de corrélation :
 
 La matrice de corrélation montre les relations linéaires entre les variables démographiques et transactionnelles.
 
@@ -64,7 +68,7 @@ variables <- c("Customer_Age", "Dependent_count", "Credit_Limit", "Total_Trans_A
 correlation_matrix <- cor(tab[, variables])
 
 # Plot avec corrplot
-par(mfrow = c(1, 1))
+par(mfrow = c(2, 2))
 corrplot(correlation_matrix, method = "color", order = "hclust",
          tl.col = "black", tl.srt = 45, addCoef.col = "black", number.cex = 0.7)
 ```
@@ -111,8 +115,10 @@ corrplot(correlation_matrix, method = "color", order = "hclust",
     - Corrélation = 0.81
     - Interprétation : Il y a une forte corrélation positive entre le montant total des transactions et le nombre total de transactions. Cela indique que les clients effectuant un plus grand nombre de transactions ont tendance à avoir un montant total de transactions plus élevé.
 
-## Test de corrélation
+## Test de corrélation :
 Les tests utilisent la statistique de corrélation de Pearson ou corrélation linéaire.
+
+### Sortie statistique :
 
 ```{r, echo=FALSE}
 # Boucle pour les tests de corrélation
@@ -174,9 +180,11 @@ for (i in 1:(length(variables) - 1)) {
    
 Les résultats de notre analyse démontrent qu'il existe des relations statistiquement significatives entre les caractéristiques démographiques, telles que l'âge du client, le nombre de personnes à charge, et les transactions financières, notamment la limite de crédit, le montant total des transactions, et le nombre total de transactions. Ces liens mettent en lumière l'importance de prendre en considération ces facteurs lors de l'évaluation des motifs de résiliation des services de cartes de crédit.
 
+
+
 # Objectif 3: Facteurs sous-jacents à la résiliation
 
-## Choix des variables
+## Choix des variables :
 Le choix des variables pour l'analyse factorielle a été guidé par l'objectif de réduire la dimensionnalité des données tout en capturant les aspects les plus significatifs liés à la résiliation des services de cartes de crédit. Les variables sélectionnées sont les suivantes :
 
 - **Customer_Age :** L'âge peut être un indicateur important du comportement financier et de la stabilité dans la relation avec la banque. Les différences générationnelles peuvent également jouer un rôle dans la résiliation.
@@ -187,11 +195,11 @@ Le choix des variables pour l'analyse factorielle a été guidé par l'objectif 
 
 - **Attrition_Flag :**  Il est essentiel d'inclure la variable cible dans l'analyse pour comprendre comment les autres variables sont liées à la résiliation.
 
-## Analyse factorielle - Interprétation des facteurs (MR1 et MR2)
+## Analyse factorielle - Interprétation des facteurs (MR1 et MR2) :
 
 Lors d'une analyse factorielle, les termes MR1 et MR2 font référence aux deux facteurs extraits. Ces termes sont souvent utilisés pour désigner les scores factoriels attribués à chaque observation (ici, chaque client) sur les deux facteurs respectifs. Chaque score factoriel est une combinaison linéaire des variables d'origine, pondérées par les charges factorielles. En d'autres termes, MR1 et MR2 représentent les scores attribués à chaque client sur les facteurs 1 et 2, respectivement.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, include=FALSE}
 # Sélection des variables pertinentes pour l'analyse factorielle
 selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt", "Attrition_Flag")
 
@@ -210,20 +218,24 @@ str(tab[, selected_vars])
 # Analyse factorielle pour réduire la dimensionnalité des données
 eigen_values <- eigen(cor(selected_data))$values # Critère de Kaiser-Guttman - retenir que les valeurs propres sup à 1
 nb_facteurs <- sum(eigen_values > 1) # Nombre de facteurs à extraire
-
-# Réalisation de l'analyse factorielle avec la variable Attrition_Flag
-fact_model <- fa(selected_data, nfactors = nb_facteurs, rotate = "varimax")
-
-# Affichage des résultats de l'analyse factorielle
-print(fact_model)
 ```
 
-### Nombre de facteurs
+### Nombre de facteurs :
 
 Le nombre de facteurs est déterminé avec le critère de Kaiser-Guttman, qui retient les facteurs dont les valeurs propres sont supérieures à 1.
 
 ```{r, echo=FALSE}
 eigen_values
+```
+
+## Sortie statistique : 
+
+```{r, echo=FALSE}
+# Réalisation de l'analyse factorielle avec la variable Attrition_Flag
+fact_model <- fa(selected_data, nfactors = nb_facteurs, rotate = "varimax")
+
+# Affichage des résultats de l'analyse factorielle
+print(fact_model)
 ```
 
 ## Interprétation des facteurs :
@@ -236,7 +248,7 @@ eigen_values
    - **Charge de Variable :** La variable avec la charge la plus élevée sur MR2 est `Credit_Limit` (0.81).
    - **Interprétation :** Les clients avec des limites de crédit plus élevées auront des scores plus élevés sur MR2. Ainsi, la limite de crédit est un facteur distinct qui contribue à ce score.
 
-**Facteurs sous-jacents à la décision de résilier :**
+## Facteurs sous-jacents à la décision de résilier : 
 
 Les résultats de l'analyse factorielle indiquent que deux facteurs principaux influent sur la décision de résilier les services de cartes de crédit :
 
@@ -248,11 +260,13 @@ Les résultats de l'analyse factorielle indiquent que deux facteurs principaux i
 
 Les facteurs sous-jacents à la résiliation des services de cartes de crédit semblent être liés aux comportements de transactions financières `Total_Trans_Amt` et aux conditions de crédit `Credit_Limit`.
 
+
+
 # Objectif 4: Modélisation prédictive
 
 L'objectif était de développer un modèle de régression logistique pour estimer la probabilité de résiliation des services de cartes de crédit en fonction des variables explicatives sélectionnées.
 
-## Choix des variables
+## Choix des variables :
 
 - **Customer_Age :** L'âge peut être un facteur clé dans la décision de résilier. Les habitudes bancaires et les besoins financiers peuvent varier considérablement entre les différentes tranches d'âge.
 
@@ -262,18 +276,7 @@ L'objectif était de développer un modèle de régression logistique pour estim
 
 - **Total_Trans_Amt et Total_Trans_Ct :** Ces variables représentent le montant total des transactions et le nombre total de transactions effectuées par le client. Des niveaux élevés dans ces deux domaines pourraient indiquer une utilisation fréquente et substantielle des services, ce qui pourrait être lié à la satisfaction et à la fidélité.
 
-## Modèle de régression logistique
-
-```{r, echo=FALSE}
-# Transformation de la variable Attrition_Flag en binaire
-tab$Attrition_Flag <- ifelse(tab$Attrition_Flag == "Attrited Customer", 1, 0)
-
-# Modèle de régression logistique, prédictive pour estimer la probabilité de résiliation
-model <- glm(Attrition_Flag ~ Customer_Age + Dependent_count + Credit_Limit + Total_Trans_Amt + Total_Trans_Ct, data = tab, family = "binomial")
-
-# Affichage des résultats du modèle
-summary(model)
-```
+## Modèle de régression logistique :
 
 ### Transformation de la variable cible :
 
@@ -284,6 +287,19 @@ Une vérification des valeurs uniques de la variable transformée confirme qu'il
 ```{r, echo=FALSE}
 # Vérification des valeurs uniques de la variable Attrition_Flag
 unique(tab$Attrition_Flag)
+```
+
+### Sortie statistique : 
+
+```{r, echo=FALSE}
+# Transformation de la variable Attrition_Flag en binaire
+tab$Attrition_Flag <- ifelse(tab$Attrition_Flag == "Attrited Customer", 1, 0)
+
+# Modèle de régression logistique, prédictive pour estimer la probabilité de résiliation
+model <- glm(Attrition_Flag ~ Customer_Age + Dependent_count + Credit_Limit + Total_Trans_Amt + Total_Trans_Ct, data = tab, family = "binomial")
+
+# Affichage des résultats du modèle
+summary(model)
 ```
 
 ### Interception (constante) significative :
@@ -306,9 +322,15 @@ L'interception du modèle est significative avec un coefficient estimé de 2.360
 Le modèle suggère que l'âge, le nombre de personnes à charge, le crédit limite, le montant total des transactions, et le nombre total de transactions sont des facteurs significatifs pour prédire la probabilité de résiliation des services de cartes de crédit.
 Les résultats indiquent des tendances cohérentes avec l'intuition, par exemple, des clients plus jeunes ou avec des limites de crédit plus élevées étant moins susceptibles de résilier.
 
+
+
 # Objectif 5: Classification des clients
 
-```{r}
+L'objectif était de classer les clients en groupes distincts en fonction de leurs comportements et caractéristiques, en particulier en ce qui concerne la résiliation des services de cartes de crédit. Pour ce faire, nous avons utilisé la méthode de classification k-means.
+
+## Sortie statistique :
+
+```{r, echo=FALSE}
 # Utilisation de méthodes de classification (par exemple, k-means)
 set.seed(123)  # Pour la reproductibilité
 num_clusters <- 3
@@ -317,16 +339,61 @@ cluster_vars <- tab[, c("Customer_Age", "Credit_Limit", "Total_Trans_Amt", "Tota
 # Algorithme de k-means
 kmeans_model <- kmeans(cluster_vars, centers = num_clusters, nstart = 20)
 
-# Affichage des résultats de la classification
-print(kmeans_model)
-
-# Visualisation en 2D des clusters créés par k-means
-library(cluster)
-par(mfrow = c(1, 1))
-clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+# Affichage des résultats de la classification sans le Clustering vector (cluster)
+print(kmeans_model[c("centers", "totss", "withinss", "tot.withinss", "betweenss", "size", "iter", "ifault")])
 ```
 
+### Graphiques k-means :
 
+  - **avec les points de données**
+  
+```{r, echo=FALSE}
+par(mfrow = c(1, 2))
+clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+```
+ 
+  - **sans les points de données**
+  
+```{r, echo=FALSE}
+par(mfrow = c(1, 2))
+clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0, main="Clusters", col.p="transparent")
+```
+
+## Résultats de la Classification :
+
+Le modèle de k-means a créé trois clusters distincts, numérotés de 1 à 3. Voici un résumé des caractéristiques moyennes de chaque cluster :
+
+- **Cluster 1 :**
+  - Age moyen : 46.45 ans
+  - Limite de crédit moyenne : 13,980.77
+  - Montant total des transactions moyen : 5,173.00
+  - Nombre total de transactions moyen : 66.97
+
+- **Cluster 2 :**
+  - Age moyen : 46.24 ans
+  - Limite de crédit moyenne : 3,604.49
+  - Montant total des transactions moyen : 3,989.16
+  - Nombre total de transactions moyen : 63.14
+
+- **Cluster 3 :**
+  - Age moyen : 46.88 ans
+  - Limite de crédit moyenne : 31,109.80
+  - Montant total des transactions moyen : 5,674.45
+  - Nombre total de transactions moyen : 69.21
+
+### Interprétation :
+
+Cette classification permet de distinguer trois profils distincts de clients en fonction de leurs caractéristiques.
+
+- **Cluster 1 :** Il semble y avoir un groupe de clients plus âgés avec une limite de crédit moyenne élevée et un nombre élevé de transactions, ce qui peut indiquer des clients fidèles et actifs.
+
+- **Cluster 2 :** Ce cluster semble être composé de clients plus jeunes avec des limites de crédit plus basses et un nombre de transactions moins élevé. Cela pourrait représenter un segment de clients moins engagés ou débutants.
+
+- **Cluster 3 :** Il s'agit potentiellement d'un groupe de clients relativement âgés avec une limite de crédit très élevée, effectuant un nombre élevé de transactions. Ces clients peuvent être des utilisateurs très actifs et à haut revenu.
+
+### Remarque :
+- La qualité de la classification peut être évaluée en examinant la somme des carrés intra-cluster et la somme des carrés inter-cluster. Dans ce cas, environ 80.1 % de la variabilité totale est expliquée par la classification en clusters, ce qui suggère une certaine robustesse du modèle.
+- Les résultats de la classification peuvent être utilisés pour mieux comprendre leurs clients et adapter leurs offres en conséquence. Par exemple, les entreprises peuvent cibler les clients du cluster 1 avec des offres de fidélisation, tandis que les entreprises peuvent cibler les clients du cluster 2 avec des offres de bienvenue.
 
 
 
@@ -343,18 +410,6 @@ L'analyse univariée des caractéristiques démographiques des clients permet de
 - **Education_Level :** Les clients ayant résilié proviennent de divers niveaux d'éducation, mais les diplômés universitaires semblent être légèrement plus nombreux.
 - **Marital_Status :** Les clients célibataires semblent plus enclins à résilier.
 - **Income_Category :** Les résiliations sont plus fréquentes chez les clients ayant des revenus modérés.
-
-### Objectif 5: Classification des clients
-
-L'utilisation de l'algorithme de classification k-means regroupe les clients en clusters distincts en fonction de leurs caractéristiques. La visualisation en 2D des clusters montre comment les clients sont regroupés en fonction de l'âge, du montant de crédit, du total des transactions, et du total des transactions effectuées. Cette classification peut aider à identifier des segments de clients ayant des comportements similaires.
-
-Ces résultats fournissent une base pour mieux comprendre les caractéristiques des clients associées à la résiliation des services de cartes de crédit et pour développer des stratégies visant à réduire la résiliation. Il est recommandé d'approfondir l'analyse, d'évaluer la performance du modèle prédictif sur un ensemble de test distinct et de vérifier la stabilité des clusters au fil du temps.
-
-
-# FAIT
-# Objectif 2
-# Objectif 3
-# Objectif 4
 
 
 
