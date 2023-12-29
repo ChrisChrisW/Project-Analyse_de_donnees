@@ -12,12 +12,15 @@ if (!require("skimr")) install.packages("skimr")
 if (!require("VIM")) install.packages("VIM")
 if (!require("outliers")) install.packages("outliers")
 if (!require("psych")) install.packages("psych")
+if (!require("corrplot")) install.packages("corrplot")
+
 # Chargement des bibliothèques
 library("ggplot2")    # Bibliothèque pour les graphiques
 library(skimr)        # Bibliothèque pour les statistiques descriptives
 library(VIM)          # Bibliothèque pour la gestion des données manquantes
 library(outliers)     # Bibliothèque pour la détection des valeurs aberrantes
 library(psych)        # Bibliothèque pour les analyses psychologiques et statistiques
+library(corrplot)     # Bibliothèque pour les graphiques de matrices de corrélation
 
 # Chargement des Données
 tab <- read.csv(file="./data/credit-card-customers/cleaned_data.csv",
@@ -39,14 +42,37 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
 # ----------------------------------------------------------------
 # Objectif 2: Étude des relations entre les variables
 # ----------------------------------------------------------------
+# Variables à tester
+variables <- c("Customer_Age", "Dependent_count", "Credit_Limit", "Total_Trans_Amt", "Total_Trans_Ct")
+
 # Matrice de corrélation pour les variables démographiques et transactionnelles
-correlation_matrix <- cor(tab[, c("Customer_Age", "Dependent_count", "Credit_Limit", "Total_Trans_Amt", "Total_Trans_Ct")])
+correlation_matrix <- cor(tab[, variables])
 
 # Affichage de la matrice de corrélation
 print(correlation_matrix)
 
-# Test de corrélation entre variables
-cor.test(tab$Customer_Age, tab$Total_Trans_Amt)
+# Plot avec corrplot
+par(mfrow = c(1, 1))
+corrplot(correlation_matrix, method = "color", type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 45, addCoef.col = "black", number.cex = 0.7)
+
+# Boucle pour les tests de corrélation
+for (i in 1:(length(variables) - 1)) {
+  for (j in (i + 1):length(variables)) {
+    
+    # Exclure la paire "Total_Trans_Amt" et "Total_Trans_Ct"
+    if (!(variables[i] %in% c("Total_Trans_Amt", "Total_Trans_Ct") && variables[j] %in% c("Total_Trans_Amt", "Total_Trans_Ct"))) {
+      
+      cat("Corrélation entre", variables[i], "et", variables[j], ":\n")
+      
+      # Test de corrélation
+      result <- cor.test(tab[, variables[i]], tab[, variables[j]])
+      
+      # Affichage de la p-value
+      cat("P-value =", result$p.value, "\n\n")
+    }
+  }
+}
 
 # ----------------------------------------------------------------
 # Objectif 3: Facteurs sous-jacents à la résiliation
