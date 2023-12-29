@@ -187,7 +187,7 @@ Le choix des variables pour l'analyse factorielle a été guidé par l'objectif 
 
 - **Attrition_Flag :**  Il est essentiel d'inclure la variable cible dans l'analyse pour comprendre comment les autres variables sont liées à la résiliation.
 
-## Analyse Factorielle - Interprétation des Facteurs (MR1 et MR2)
+## Analyse factorielle - Interprétation des facteurs (MR1 et MR2)
 
 Lors d'une analyse factorielle, les termes MR1 et MR2 font référence aux deux facteurs extraits. Ces termes sont souvent utilisés pour désigner les scores factoriels attribués à chaque observation (ici, chaque client) sur les deux facteurs respectifs. Chaque score factoriel est une combinaison linéaire des variables d'origine, pondérées par les charges factorielles. En d'autres termes, MR1 et MR2 représentent les scores attribués à chaque client sur les facteurs 1 et 2, respectivement.
 
@@ -226,7 +226,7 @@ Le nombre de facteurs est déterminé avec le critère de Kaiser-Guttman, qui re
 eigen_values
 ```
 
-## Interprétation des Facteurs :
+## Interprétation des facteurs :
 
 - **MR1 (Facteur 1) :**
    - **Charge de Variable :** La variable ayant la charge la plus élevée sur MR1 est `Total_Trans_Amt` (0.95).
@@ -236,21 +236,35 @@ eigen_values
    - **Charge de Variable :** La variable avec la charge la plus élevée sur MR2 est `Credit_Limit` (0.81).
    - **Interprétation :** Les clients avec des limites de crédit plus élevées auront des scores plus élevés sur MR2. Ainsi, la limite de crédit est un facteur distinct qui contribue à ce score.
 
-**Facteurs sous-jacents à la Décision de Résilier :**
+**Facteurs sous-jacents à la décision de résilier :**
 
 Les résultats de l'analyse factorielle indiquent que deux facteurs principaux influent sur la décision de résilier les services de cartes de crédit :
 
-- **Facteur 1 (MR1) - Transactions Financières Élevées :**
+- **Facteur 1 (MR1) - Transactions financières élevées :**
    - Les clients avec des montants de transactions élevés sont associés à un score plus élevé sur MR1. Cela pourrait suggérer que des activités financières importantes ou fréquentes contribuent à la décision de résilier.
 
-- **Facteur 2 (MR2) - Limite de Crédit Élevée :**
+- **Facteur 2 (MR2) - Limite de crédit élevée :**
    - Les clients ayant une limite de crédit plus élevée ont des scores plus élevés sur MR2. Cela indique que la limite de crédit est un autre facteur significatif lié à la résiliation.
 
 Les facteurs sous-jacents à la résiliation des services de cartes de crédit semblent être liés aux comportements de transactions financières `Total_Trans_Amt` et aux conditions de crédit `Credit_Limit`.
 
 # Objectif 4: Modélisation prédictive
 
-```{r}
+L'objectif était de développer un modèle de régression logistique pour estimer la probabilité de résiliation des services de cartes de crédit en fonction des variables explicatives sélectionnées.
+
+## Choix des variables
+
+- **Customer_Age :** L'âge peut être un facteur clé dans la décision de résilier. Les habitudes bancaires et les besoins financiers peuvent varier considérablement entre les différentes tranches d'âge.
+
+- **Dependent_count :** Le nombre de personnes à charge peut influencer la stabilité financière d'un ménage. Des responsabilités familiales plus importantes peuvent être liées à des besoins financiers différents.
+
+- **Credit_Limit :** La limite de crédit peut refléter la stabilité financière du client. Des limites de crédit plus élevées pourraient indiquer une meilleure solvabilité et potentiellement une moindre propension à résilier.
+
+- **Total_Trans_Amt et Total_Trans_Ct :** Ces variables représentent le montant total des transactions et le nombre total de transactions effectuées par le client. Des niveaux élevés dans ces deux domaines pourraient indiquer une utilisation fréquente et substantielle des services, ce qui pourrait être lié à la satisfaction et à la fidélité.
+
+## Modèle de régression logistique
+
+```{r, echo=FALSE}
 # Transformation de la variable Attrition_Flag en binaire
 tab$Attrition_Flag <- ifelse(tab$Attrition_Flag == "Attrited Customer", 1, 0)
 
@@ -260,6 +274,37 @@ model <- glm(Attrition_Flag ~ Customer_Age + Dependent_count + Credit_Limit + To
 # Affichage des résultats du modèle
 summary(model)
 ```
+
+### Transformation de la variable cible :
+
+La variable cible `Attrition_Flag` a été transformée en une variable binaire où 1 représente les clients ayant résilié et 0 les clients non résiliés.
+
+Une vérification des valeurs uniques de la variable transformée confirme qu'il y a deux catégories, 0 et 1, ce qui est conforme à l'attente.
+
+```{r, echo=FALSE}
+# Vérification des valeurs uniques de la variable Attrition_Flag
+unique(tab$Attrition_Flag)
+```
+
+### Interception (constante) significative :
+L'interception du modèle est significative avec un coefficient estimé de 2.360 et une erreur standard de 0.2592. Cela indique que la probabilité de résiliation est significativement différente de zéro lorsque toutes les variables explicatives sont égales à zéro.
+
+### Variables explicatives :
+   - **Customer_Age :**
+     - La p-value de 0.0415 suggère une signification marginale de l'âge du client dans la probabilité de résiliation. Chaque année supplémentaire diminue la probabilité de résiliation.
+   - **Dependent_count :**
+     - Le coefficient positif de 0.1108 indique que la probabilité de résiliation augmente avec le nombre de personnes à charge.
+   - **Credit_Limit :**
+     - La p-value de 0.00679 suggère une signification, et le coefficient négatif indique que des limites de crédit plus élevées sont associées à une diminution de la probabilité de résiliation.
+   - **Total_Trans_Amt et Total_Trans_Ct :**
+     - Les coefficients négatifs des deux variables suggèrent que des montants de transaction totaux plus élevés et un nombre total de transactions plus élevé sont associés à une diminution de la probabilité de résiliation.
+
+### Performance du modèle :
+   - La p-value globale du modèle est très basse, indiquant qu'au moins une des variables explicatives est utile pour prédire la résiliation.
+   - La réduction significative de la deviance résiduelle par rapport à la deviance nulle suggère un bon ajustement du modèle.
+
+Le modèle suggère que l'âge, le nombre de personnes à charge, le crédit limite, le montant total des transactions, et le nombre total de transactions sont des facteurs significatifs pour prédire la probabilité de résiliation des services de cartes de crédit.
+Les résultats indiquent des tendances cohérentes avec l'intuition, par exemple, des clients plus jeunes ou avec des limites de crédit plus élevées étant moins susceptibles de résilier.
 
 # Objectif 5: Classification des clients
 
@@ -299,10 +344,6 @@ L'analyse univariée des caractéristiques démographiques des clients permet de
 - **Marital_Status :** Les clients célibataires semblent plus enclins à résilier.
 - **Income_Category :** Les résiliations sont plus fréquentes chez les clients ayant des revenus modérés.
 
-### Objectif 4: Modélisation prédictive
-
-Le modèle de régression logistique est utilisé pour estimer la probabilité de résiliation en fonction des variables disponibles. Les coefficients du modèle indiquent l'impact de chaque variable sur la probabilité de résiliation. Une analyse plus approfondie des résultats, notamment des p-values, est nécessaire pour évaluer la significativité des coefficients.
-
 ### Objectif 5: Classification des clients
 
 L'utilisation de l'algorithme de classification k-means regroupe les clients en clusters distincts en fonction de leurs caractéristiques. La visualisation en 2D des clusters montre comment les clients sont regroupés en fonction de l'âge, du montant de crédit, du total des transactions, et du total des transactions effectuées. Cette classification peut aider à identifier des segments de clients ayant des comportements similaires.
@@ -313,4 +354,7 @@ Ces résultats fournissent une base pour mieux comprendre les caractéristiques 
 # FAIT
 # Objectif 2
 # Objectif 3
+# Objectif 4
+
+
 
