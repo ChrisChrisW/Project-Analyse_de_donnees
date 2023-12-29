@@ -78,17 +78,26 @@ for (i in 1:(length(variables) - 1)) {
 # Objectif 3: Facteurs sous-jacents à la résiliation
 # ----------------------------------------------------------------
 # Sélection des variables pertinentes pour l'analyse factorielle
-selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt")
+selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt", "Attrition_Flag")
+
+# Sélection des variables pertinentes
+selected_data <- tab[, selected_vars]
+
+# Conversion de la variable Attrition_Flag en facteur
+selected_data$Attrition_Flag <- as.factor(selected_data$Attrition_Flag)
+
+# Conversion du facteur en numérique (0 pour Existing Customer, 1 pour Attrited Customer)
+selected_data$Attrition_Flag <- as.numeric(selected_data$Attrition_Flag) - 1
 
 # Affichage de la structure des colonnes sélectionnées
 str(tab[, selected_vars])
 
-# Résumé statistique des colonnes sélectionnées
-summary(tab[, selected_vars])
-
 # Analyse factorielle pour réduire la dimensionnalité des données
-nb_facteurs <- 2  # Nombre de facteurs à extraire
-fact_model <- fa(tab[, selected_vars], nfactors = nb_facteurs, rotate = "varimax")
+eigen_values <- eigen(cor(selected_data))$values # Critère de Kaiser-Guttman - retenir que les valeurs propres sup à 1
+nb_facteurs <- sum(eigen_values > 1) # Nombre de facteurs à extraire
+
+# Réalisation de l'analyse factorielle avec la variable Attrition_Flag
+fact_model <- fa(selected_data, nfactors = nb_facteurs, rotate = "varimax")
 
 # Affichage des résultats de l'analyse factorielle
 print(fact_model)

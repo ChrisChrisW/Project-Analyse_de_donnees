@@ -176,20 +176,66 @@ Les résultats de notre analyse démontrent qu'il existe des relations statistiq
 
 # Objectif 3: Facteurs sous-jacents à la résiliation
 
-```{r}
-# Sélection des variables pertinentes pour l'analyse factorielle
-selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt")
+## Analyse Factorielle - Interprétation des Facteurs (MR1 et MR2)
 
-# Résumé statistique des colonnes sélectionnées
-summary(tab[, selected_vars])
+Lors d'une analyse factorielle, les termes MR1 et MR2 font référence aux deux facteurs extraits. Ces termes sont souvent utilisés pour désigner les scores factoriels attribués à chaque observation (ici, chaque client) sur les deux facteurs respectifs. Chaque score factoriel est une combinaison linéaire des variables d'origine, pondérées par les charges factorielles. En d'autres termes, MR1 et MR2 représentent les scores attribués à chaque client sur les facteurs 1 et 2, respectivement.
+
+```{r, echo=FALSE}
+# Sélection des variables pertinentes pour l'analyse factorielle
+selected_vars <- c("Customer_Age", "Credit_Limit", "Total_Trans_Amt", "Attrition_Flag")
+
+# Sélection des variables pertinentes
+selected_data <- tab[, selected_vars]
+
+# Conversion de la variable Attrition_Flag en facteur
+selected_data$Attrition_Flag <- as.factor(selected_data$Attrition_Flag)
+
+# Conversion du facteur en numérique (0 pour Existing Customer, 1 pour Attrited Customer)
+selected_data$Attrition_Flag <- as.numeric(selected_data$Attrition_Flag) - 1
+
+# Affichage de la structure des colonnes sélectionnées
+str(tab[, selected_vars])
 
 # Analyse factorielle pour réduire la dimensionnalité des données
-nb_facteurs <- 2  # Nombre de facteurs à extraire
-fact_model <- fa(tab[, selected_vars], nfactors = nb_facteurs, rotate = "varimax")
+eigen_values <- eigen(cor(selected_data))$values # Critère de Kaiser-Guttman - retenir que les valeurs propres sup à 1
+nb_facteurs <- sum(eigen_values > 1) # Nombre de facteurs à extraire
+
+# Réalisation de l'analyse factorielle avec la variable Attrition_Flag
+fact_model <- fa(selected_data, nfactors = nb_facteurs, rotate = "varimax")
 
 # Affichage des résultats de l'analyse factorielle
 print(fact_model)
 ```
+
+### Nombre de facteurs
+
+Le nombre de facteurs est déterminé avec le critère de Kaiser-Guttman, qui retient les facteurs dont les valeurs propres sont supérieures à 1.
+
+```{r, echo=FALSE}
+eigen_values
+```
+
+## Interprétation des Facteurs :
+
+- **MR1 (Facteur 1) :**
+   - **Charge de Variable :** La variable ayant la charge la plus élevée sur MR1 est `Total_Trans_Amt` (0.95).
+   - **Interprétation :** Les clients avec des montants de transactions élevés auront des scores plus élevés sur MR1. Cela suggère que des transactions financières importantes contribuent à ce facteur.
+
+- **MR2 (Facteur 2) :**
+   - **Charge de Variable :** La variable avec la charge la plus élevée sur MR2 est `Credit_Limit` (0.81).
+   - **Interprétation :** Les clients avec des limites de crédit plus élevées auront des scores plus élevés sur MR2. Ainsi, la limite de crédit est un facteur distinct qui contribue à ce score.
+
+**Facteurs sous-jacents à la Décision de Résilier :**
+
+Les résultats de l'analyse factorielle indiquent que deux facteurs principaux influent sur la décision de résilier les services de cartes de crédit :
+
+- **Facteur 1 (MR1) - Transactions Financières Élevées :**
+   - Les clients avec des montants de transactions élevés sont associés à un score plus élevé sur MR1. Cela pourrait suggérer que des activités financières importantes ou fréquentes contribuent à la décision de résilier.
+
+- **Facteur 2 (MR2) - Limite de Crédit Élevée :**
+   - Les clients ayant une limite de crédit plus élevée ont des scores plus élevés sur MR2. Cela indique que la limite de crédit est un autre facteur significatif lié à la résiliation.
+
+Les facteurs sous-jacents à la résiliation des services de cartes de crédit semblent être liés aux comportements de transactions financières `Total_Trans_Amt` et aux conditions de crédit `Credit_Limit`.
 
 # Objectif 4: Modélisation prédictive
 
@@ -242,10 +288,6 @@ L'analyse univariée des caractéristiques démographiques des clients permet de
 - **Marital_Status :** Les clients célibataires semblent plus enclins à résilier.
 - **Income_Category :** Les résiliations sont plus fréquentes chez les clients ayant des revenus modérés.
 
-### Objectif 3: Facteurs sous-jacents à la résiliation
-
-L'analyse factorielle avec rotation varimax sur les variables sélectionnées (Customer_Age, Credit_Limit, Total_Trans_Amt) réduit la dimensionnalité des données. Les résultats montrent les facteurs sous-jacents aux caractéristiques sélectionnées, mais il est essentiel d'interpréter ces facteurs en fonction du contexte.
-
 ### Objectif 4: Modélisation prédictive
 
 Le modèle de régression logistique est utilisé pour estimer la probabilité de résiliation en fonction des variables disponibles. Les coefficients du modèle indiquent l'impact de chaque variable sur la probabilité de résiliation. Une analyse plus approfondie des résultats, notamment des p-values, est nécessaire pour évaluer la significativité des coefficients.
@@ -259,3 +301,5 @@ Ces résultats fournissent une base pour mieux comprendre les caractéristiques 
 
 # FAIT
 # Objectif 2
+# Objectif 3
+
