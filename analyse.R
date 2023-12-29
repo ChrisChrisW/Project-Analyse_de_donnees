@@ -33,12 +33,30 @@ tab <- read.csv(file="./data/credit-card-customers/cleaned_data.csv",
 # ----------------------------------------------------------------
 # Objectif 1: Compréhension des caractéristiques démographiques
 # ----------------------------------------------------------------
+# Calcul des pourcentages
+calculate_percentage <- function(x, y) {
+  return(prop.table(table(x, y), margin = 1) * 100)
+}
+
 # Profils démographiques des clients résiliant leurs services de cartes de crédit
-par(mfrow = c(2, 3))
+for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
+  # Analyse univariée pour chaque variable démographique
+  cat("====================\n")
+  cat("Variable:", var, "\n\n")
+  
+  cat("Tableau des fréquences:\n")
+  print(table(tab$Attrition_Flag, tab[[var]]))
+  
+  cat("\nTableau des fréquences avec pourcentages:\n")
+  print(calculate_percentage(tab$Attrition_Flag, tab[[var]]))
+  cat("====================\n")
+}
+
+par(mfrow = c(1, 1))
 
 # Analyse univariée pour chaque variable démographique
 for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
-  barplot(table(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
+  barplot(calculate_percentage(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
 }
 
 # ----------------------------------------------------------------
