@@ -1,18 +1,60 @@
 ---
 title: "Analyse des Résiliations de Cartes de Crédit"
 author: "Boujamaa Atrmouh - Christophe WANG"
+date: "1 janvier 2024"
 output: 
   pdf_document:
     latex_engine: xelatex
+    toc: true
 ---
+
+\newpage
+
+# Introduction
+
+Les services de cartes de crédit, moteurs de l'économie moderne, font face au défi majeur de la résiliation client. Comprendre les tenants et aboutissants de cette décision devient impératif. Cette étude explore les facteurs et profils clients liés à la résiliation des cartes de crédit, avec pour objectif la prédiction de ce phénomène. Des analyses approfondies, allant de la corrélation à la modélisation prédictive, offriront des insights précieux pour les institutions financières.
+
+## Source des données :
+
+Les données utilisées dans cette analyse proviennent du jeu de données "Credit Card Customers" disponible sur Kaggle à l'adresse suivante : [Credit Card Customers Dataset](https://www.kaggle.com/datasets/sakshigoyal7/credit-card-customers).
+
+Les données ont été préalablement traitées, et vous pouvez vous référer au document de pré-analyse pour obtenir des détails sur ce processus. Ensuite, une phase de nettoyage a été effectuée pour préparer les données, lesquelles ont été ensuite sauvegardées dans un fichier CSV comprenant les informations traitées.
+
+## Outils Utilisés :
+
+-   Langage de programmation : R
+-   Bibliothèques : ggplot2, skimr, VIM, outliers, psych, corrplot, cluster
+
+## Problématique :
+
+**Problématique :** Quels facteurs et profils de clients sont associés à la résiliation des services de cartes de crédit, et comment peut-on les prédire?
+
+  
+## Objectifs :
+
+1.  **Compréhension des caractéristiques démographiques :**
+    -   **Question :** Quels sont les profils démographiques des clients résiliant leurs services de cartes de crédit?
+    -   **Méthodologie :** Analyses descriptives univariées pour chaque variable démographique.
+2.  **Étude des relations entre les variables :**
+    -   **Question :** Existe-t-il des relations significatives entre les différentes variables démographiques et transactionnelles?
+    -   **Méthodologie :** Analyses bivariées avec des tests de corrélation pour évaluer les relations.
+3.  **Facteurs sous-jacents à la résiliation :**
+    -   **Question :** Quels sont les facteurs sous-jacents qui contribuent le plus à la décision de résilier?
+    -   **Méthodologie :** Analyses factorielles pour réduire la dimensionnalité des données.
+4.  **Modélisation prédictive :**
+    -   **Question :** Peut-on développer un modèle de régression prédictive pour estimer la probabilité de résiliation en fonction des variables disponibles?
+    -   **Méthodologie :** Utilisation de méthodes de régression.
+5.  **Classification des clients :**
+    -   **Question :** Peut-on classer les clients en groupes distincts en fonction de leurs comportements et caractéristiques, en particulier en ce qui concerne la résiliation?
+    -   **Méthodologie :** Utilisation de méthodes de classification.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
 ```
 
-# Chargement des données
 
 ```{r, message=FALSE, echo=FALSE}
+# Chargement des données
 library(ggplot2)
 library(skimr)
 library(VIM)
@@ -25,13 +67,14 @@ library(cluster)
 tab <- read.csv(file = "./data/credit-card-customers/cleaned_data.csv", sep = ',', dec = '.', header = TRUE)
 ```
 
+
 # Objectif 1: Compréhension des caractéristiques démographiques
 
-L'objectif de cette première phase d'analyse est de comprendre les profils démographiques des clients résiliant leurs services de cartes de crédit par le biais de plusieurs variables clés.
+L'objectif de cette première phase d'analyse est de comprendre les profils démographiques des clients résiliant leurs services de cartes de crédit à travers plusieurs variables clés.
 
 ## Sortie statistique :
 
-- brute :
+### En valeurs brutes :
 
 ```{r, echo=FALSE}
 # Profils démographiques des clients résiliant leurs services de cartes de crédit
@@ -43,7 +86,7 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
 }
 ```
 
-- en pourcentage :
+### en pourcentage :
 
 ```{r, echo=FALSE}
 # Profils démographiques des clients résiliant leurs services de cartes de crédit
@@ -62,22 +105,21 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
 
 ## Analyse
 
-1. **Age du Client :** La distribution par âge révèle que la majorité des clients résiliants ont entre 40 et 50 ans, avec une concentration significative également dans la tranche de 50 à 60 ans. En revanche, les clients existants sont répartis sur une gamme plus large d'âges, avec une concentration relativement élevée dans la tranche de 40 à 50 ans. Il est essentiel de prendre en compte cette répartition lors de l'analyse des profils démographiques.
+1. **Customer_Age (Age du client) :** La distribution par âge révèle que la majorité des clients résiliants ont entre 40 et 50 ans, avec une concentration significative également dans la tranche de 50 à 60 ans. En revanche, les clients existants sont répartis sur une gamme plus large d'âges, avec une concentration relativement élevée dans la tranche de 40 à 50 ans. Il est essentiel de prendre en compte cette répartition lors de l'analyse des profils démographiques.
 
-2. **Genre :** En termes de genre, il y a une répartition relativement équilibrée entre les clients résiliants et existants. Les clients résiliants se répartissent à 51,75% de femmes et 48,25% d'hommes, tandis que les clients existants sont répartis à 46,92% de femmes et 53,08% d'hommes.
+2. **Gender (Genre) :** En termes de genre, la répartition entre les clients résiliants et existants est relativement équilibrée. Les clients résiliants se composent à 51,75% de femmes et 48,25% d'hommes, tandis que les clients existants se répartissent à 46,92% de femmes et 53,08% d'hommes.
 
-3. **Nombre de Personnes à Charge :** L'analyse du nombre de personnes à charge indique que les clients résiliants ont tendance à avoir une distribution plus homogène, tandis que les clients existants montrent une répartition plus variée.
+3. **Dependent_count (Nombre de personnes à charge) :** L'analyse du nombre de personnes à charge indique que les clients résiliants ont tendance à avoir une distribution plus homogène, tandis que les clients existants montrent une répartition plus variée.
 
-4. **Niveau d'Éducation :** Le niveau d'éducation des clients résiliants et existants est assez similaire, avec une majorité ayant complété un diplôme de niveau collégial ou universitaire. Cette variable peut ne pas être un indicateur significatif de la résiliation.
+4. **Education_Level (Niveau d'éducation) :** Le niveau d'éducation des clients résiliants et existants est assez similaire, avec une majorité ayant complété un diplôme de niveau collégial ou universitaire. Cette variable peut ne pas être un indicateur significatif de la résiliation.
 
-5. **Statut matrimonial :** Le statut matrimonial montre que parmi les clients résiliants, une proportion importante est composée de personnes mariées (47,53%), suivies de près par les célibataires (44,20%). Pour les clients existants, la majorité est également mariée (50,87%), suivie de célibataires (41,13%).
+5. **Marital_Status (Statut matrimonial) :** Le statut matrimonial montre que parmi les clients résiliants, une proportion importante est composée de personnes mariées (47,53%), suivies de près par les célibataires (44,20%). Pour les clients existants, la majorité est également mariée (50,87%), suivie de célibataires (41,13%).
 
-6. **Catégorie de revenu :** En termes de catégorie de revenu, les clients résiliants ont une distribution plus importante dans la catégorie "Moins de 40 000 $" (42,50%), tandis que les clients existants montrent une distribution plus équilibrée entre les catégories de revenus.
+6. **Income_Category (Catégorie de revenu) :** En termes de catégorie de revenu, les clients résiliants ont une distribution plus importante dans la catégorie "Moins de 40 000 $" (42,50%), tandis que les clients existants montrent une distribution plus équilibrée entre les catégories de revenus.
 
-L'analyse des caractéristiques démographiques suggère que l'âge, le statut matrimonial, et la catégorie de revenu peuvent être des facteurs importants à considérer lors de l'identification des profils démographiques des clients résiliant leurs services de cartes de crédit.
-Ls clients résiliant leurs services de cartes de crédit sont souvent des individus dans la tranche d'âge de 40 à 50 ans, majoritairement mariés, avec un niveau d'éducation collégial ou universitaire, et une concentration plus élevée dans la catégorie de revenu "Moins de 40 000 $".
+L'analyse des caractéristiques démographiques suggère que l'âge, le statut matrimonial et la catégorie de revenu peuvent être des facteurs importants à considérer lors de l'identification des profils démographiques des clients résiliant leurs services de cartes de crédit. Les clients résiliant leurs services de cartes de crédit sont souvent des individus dans la tranche d'âge de 40 à 50 ans, majoritairement mariés, avec un niveau d'éducation collégial ou universitaire, et une concentration plus élevée dans la catégorie de revenu "Moins de 40 000 $".
 
-
+\newpage
 
 # Objectif 2: Étude des relations entre les variables
 
@@ -117,7 +159,7 @@ corrplot(correlation_matrix, method = "color", order = "hclust",
 
 - **Customer_Age et Dependent_count :**
    - Corrélation = -0.13
-   - Interprétation : Il y a une corrélation négative faible entre l'âge du client et le nombre de personnes à charge. Cela suggère que, en général, les clients plus âgés ont tendance à avoir moins de personnes à charge.
+   - Interprétation : Une corrélation négative faible suggère que les clients plus âgés ont tendance à avoir moins de personnes à charge.
 
 - **Customer_Age et Credit_Limit :**
    - Corrélation = 0.02
@@ -129,11 +171,11 @@ corrplot(correlation_matrix, method = "color", order = "hclust",
 
 - **Customer_Age et Total_Trans_Ct :**
    - Corrélation = -0.07
-   - Interprétation : Il y a une corrélation négative faible entre l'âge du client et le nombre total de transactions. Cela suggère que les clients plus âgés ont tendance à effectuer moins de transactions.
+   - Interprétation : Une corrélation négative faible suggère que les clients plus âgés ont tendance à effectuer moins de transactions.
 
 - **Dependent_count et Credit_Limit :**
    - Corrélation = 0.08
-   - Interprétation : Il y a une corrélation positive faible entre le nombre de personnes à charge et la limite de crédit. Cela pourrait signifier que les clients avec plus de personnes à charge ont tendance à avoir une limite de crédit légèrement plus élevée.
+   - Interprétation : Une corrélation positive faible indique que les clients avec plus de personnes à charge ont tendance à avoir une limite de crédit légèrement plus élevée.
 
 - **Dependent_count et Total_Trans_Amt :**
    - Corrélation = 0.02
@@ -145,7 +187,7 @@ corrplot(correlation_matrix, method = "color", order = "hclust",
 
 - **Credit_Limit et Total_Trans_Amt :**
    - Corrélation = 0.17
-   - Interprétation : Il y a une corrélation positive modérée entre la limite de crédit et le montant total des transactions. Cela indique que les clients avec une limite de crédit plus élevée ont tendance à effectuer des transactions de montant plus élevé.
+   - Interprétation : Il y a une corrélation positive modérée entre la limite de crédit et le montant total des transactions. Les clients avec une limite de crédit plus élevée ont tendance à effectuer des transactions de montant plus élevé.
 
 - **Credit_Limit et Total_Trans_Ct :**
    - Corrélation = 0.08
@@ -220,9 +262,12 @@ for (i in 1:(length(variables) - 1)) {
    
 Les résultats de notre analyse démontrent qu'il existe des relations statistiquement significatives entre les caractéristiques démographiques, telles que l'âge du client, le nombre de personnes à charge, et les transactions financières, notamment la limite de crédit, le montant total des transactions, et le nombre total de transactions. Ces liens mettent en lumière l'importance de prendre en considération ces facteurs lors de l'évaluation des motifs de résiliation des services de cartes de crédit.
 
-
+\newpage
 
 # Objectif 3: Facteurs sous-jacents à la résiliation
+
+## Choix des variables :
+Le choix des variables pour l'analyse factorielle a été guidé par l'objectif de réduire la dimensionnalité des données tout en capturant les aspects les plus significatifs liés à la résiliation des services de cartes de crédit. Les variables sélectionnées sont les suivantes :
 
 ## Choix des variables :
 Le choix des variables pour l'analyse factorielle a été guidé par l'objectif de réduire la dimensionnalité des données tout en capturant les aspects les plus significatifs liés à la résiliation des services de cartes de crédit. Les variables sélectionnées sont les suivantes :
@@ -281,11 +326,11 @@ print(fact_model)
 ## Interprétation des facteurs :
 
 - **MR1 (Facteur 1) :**
-   - **Charge de Variable :** La variable ayant la charge la plus élevée sur MR1 est `Total_Trans_Amt` (0.95).
+   - **Charge de Variable :** La variable ayant la charge la plus élevée sur MR1 est Total_Trans_Amt (0.95).
    - **Interprétation :** Les clients avec des montants de transactions élevés auront des scores plus élevés sur MR1. Cela suggère que des transactions financières importantes contribuent à ce facteur.
 
 - **MR2 (Facteur 2) :**
-   - **Charge de Variable :** La variable avec la charge la plus élevée sur MR2 est `Credit_Limit` (0.81).
+   - **Charge de Variable :** La variable avec la charge la plus élevée sur MR2 est Credit_Limit (0.81).
    - **Interprétation :** Les clients avec des limites de crédit plus élevées auront des scores plus élevés sur MR2. Ainsi, la limite de crédit est un facteur distinct qui contribue à ce score.
 
 ## Facteurs sous-jacents à la décision de résilier : 
@@ -293,14 +338,14 @@ print(fact_model)
 Les résultats de l'analyse factorielle indiquent que deux facteurs principaux influent sur la décision de résilier les services de cartes de crédit :
 
 - **Facteur 1 (MR1) - Transactions financières élevées :**
-   - Les clients avec des montants de transactions élevés sont associés à un score plus élevé sur MR1. Cela pourrait suggérer que des activités financières importantes ou fréquentes contribuent à la décision de résilier.
+Les clients avec des montants de transactions élevés sont associés à un score plus élevé sur MR1. Cela pourrait suggérer que des activités financières importantes ou fréquentes contribuent à la décision de résilier.
 
 - **Facteur 2 (MR2) - Limite de crédit élevée :**
-   - Les clients ayant une limite de crédit plus élevée ont des scores plus élevés sur MR2. Cela indique que la limite de crédit est un autre facteur significatif lié à la résiliation.
+Les clients ayant une limite de crédit plus élevée ont des scores plus élevés sur MR2. Cela indique que la limite de crédit est un autre facteur significatif lié à la résiliation.
 
 Les facteurs sous-jacents à la résiliation des services de cartes de crédit semblent être liés aux comportements de transactions financières `Total_Trans_Amt` et aux conditions de crédit `Credit_Limit`.
 
-
+\newpage
 
 # Objectif 4: Modélisation prédictive
 
@@ -346,23 +391,18 @@ summary(model)
 L'interception du modèle est significative avec un coefficient estimé de 2.360 et une erreur standard de 0.2592. Cela indique que la probabilité de résiliation est significativement différente de zéro lorsque toutes les variables explicatives sont égales à zéro.
 
 ### Variables explicatives :
-   - **Customer_Age :**
-     - La p-value de 0.0415 suggère une signification marginale de l'âge du client dans la probabilité de résiliation. Chaque année supplémentaire diminue la probabilité de résiliation.
-   - **Dependent_count :**
-     - Le coefficient positif de 0.1108 indique que la probabilité de résiliation augmente avec le nombre de personnes à charge.
-   - **Credit_Limit :**
-     - La p-value de 0.00679 suggère une signification, et le coefficient négatif indique que des limites de crédit plus élevées sont associées à une diminution de la probabilité de résiliation.
-   - **Total_Trans_Amt et Total_Trans_Ct :**
-     - Les coefficients négatifs des deux variables suggèrent que des montants de transaction totaux plus élevés et un nombre total de transactions plus élevé sont associés à une diminution de la probabilité de résiliation.
+   - **Customer_Age :** La p-value de 0.0415 suggère une signification marginale de l'âge du client dans la probabilité de résiliation. Chaque année supplémentaire diminue la probabilité de résiliation.
+   - **Dependent_count :** Le coefficient positif de 0.1108 indique que la probabilité de résiliation augmente avec le nombre de personnes à charge.
+   - **Credit_Limit :** La p-value de 0.00679 suggère une signification, et le coefficient négatif indique que des limites de crédit plus élevées sont associées à une diminution de la probabilité de résiliation.
+   - **Total_Trans_Amt et Total_Trans_Ct :** Les coefficients négatifs des deux variables suggèrent que des montants de transaction totaux plus élevés et un nombre total de transactions plus élevé sont associés à une diminution de la probabilité de résiliation.
 
 ### Performance du modèle :
    - La p-value globale du modèle est très basse, indiquant qu'au moins une des variables explicatives est utile pour prédire la résiliation.
    - La réduction significative de la deviance résiduelle par rapport à la deviance nulle suggère un bon ajustement du modèle.
 
-Le modèle suggère que l'âge, le nombre de personnes à charge, le crédit limite, le montant total des transactions, et le nombre total de transactions sont des facteurs significatifs pour prédire la probabilité de résiliation des services de cartes de crédit.
-Les résultats indiquent des tendances cohérentes avec l'intuition, par exemple, des clients plus jeunes ou avec des limites de crédit plus élevées étant moins susceptibles de résilier.
+Le modèle suggère que l'âge, le nombre de personnes à charge, le crédit limite, le montant total des transactions, et le nombre total de transactions sont des facteurs significatifs pour prédire la probabilité de résiliation des services de cartes de crédit. Les résultats indiquent des tendances cohérentes avec l'intuition, par exemple, des clients plus jeunes ou avec des limites de crédit plus élevées étant moins susceptibles de résilier.
 
-
+\newpage
 
 # Objectif 5: Classification des clients
 
@@ -383,17 +423,21 @@ kmeans_model <- kmeans(cluster_vars, centers = num_clusters, nstart = 20)
 print(kmeans_model[c("centers", "totss", "withinss", "tot.withinss", "betweenss", "size", "iter", "ifault")])
 ```
 
+\newpage
+
 ### Graphiques k-means :
 
-  - **avec les points de données**
-  
+#### Avec les points de données :
+
 ```{r, echo=FALSE}
 par(mfrow = c(1, 2))
 clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
 ```
- 
-  - **sans les points de données**
-  
+
+\newpage
+
+#### Sans les points de données :
+
 ```{r, echo=FALSE}
 par(mfrow = c(1, 2))
 clusplot(cluster_vars, kmeans_model$cluster, color=TRUE, shade=TRUE, labels=2, lines=0, main="Clusters", col.p="transparent")
@@ -434,3 +478,17 @@ Cette classification permet de distinguer trois profils distincts de clients en 
 ### Remarque :
 - La qualité de la classification peut être évaluée en examinant la somme des carrés intra-cluster et la somme des carrés inter-cluster. Dans ce cas, environ 80.1 % de la variabilité totale est expliquée par la classification en clusters, ce qui suggère une certaine robustesse du modèle.
 - Les résultats de la classification peuvent être utilisés pour mieux comprendre leurs clients et adapter leurs offres en conséquence. Par exemple, les entreprises peuvent cibler les clients du cluster 1 avec des offres de fidélisation, tandis que les entreprises peuvent cibler les clients du cluster 2 avec des offres de bienvenue.
+
+\newpage
+
+# Conclusion
+
+Cette étude approfondie visait à répondre à la problématique centrale : "Quels facteurs et profils de clients sont associés à la résiliation des services de cartes de crédit, et comment peut-on les prédire?" Les résultats obtenus ont permis d'apporter des éclairages significatifs sur cette question complexe.
+
+**Récapitulation des Découvertes :** L'analyse détaillée des variables, qu'elles soient démographiques ou transactionnelles, a révélé des relations subtiles mais significatives. L'âge, la situation familiale, la limite de crédit, et les comportements transactionnels ont émergé comme des facteurs clés influençant la décision de résiliation. Ces résultats offrent une perspective approfondie sur les facteurs et les profils de clients liés à la résiliation des services de cartes de crédit, fournissant ainsi une compréhension approfondie des éléments en jeu.
+
+**Impact sur la Prise de Décision Stratégique :** Ces résultats ne sont pas simplement des observations, mais des outils puissants pour les institutions financières. Ils peuvent ajuster leurs stratégies de rétention en tenant compte des facteurs critiques. Par exemple, des offres personnalisées pour les segments démographiques spécifiques ou des ajustements de limites de crédit pourraient être envisagés pour renforcer la fidélité des clients.
+
+**Ouverture vers des Études Futures :** Cette étude constitue une base pour approfondir la compréhension des motifs de résiliation des services de cartes de crédit. Des investigations futures pourraient se concentrer sur des aspects spécifiques, notamment l'impact des programmes de fidélisation, l'influence des canaux de communication sur la rétention, ou encore l'exploration des facteurs psychologiques liés à la décision de résilier. En explorant ces domaines, les chercheurs pourraient apporter des éclairages supplémentaires, contribuant ainsi à affiner davantage les stratégies de rétention des institutions financières.
+
+Cette investigation vise à guider les décisions futures des institutions financières en fournissant des perspectives sur les dynamiques de résiliation des services de cartes de crédit. Les "insights" ou résultats obtenus peuvent servir de fondement pour des stratégies de rétention plus efficaces et une adaptation continue aux besoins changeants des clients.

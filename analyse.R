@@ -52,7 +52,7 @@ for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "M
   cat("====================\n")
 }
 
-par(mfrow = c(1, 1))
+par(mfrow = c(2, 3))
 
 # Analyse univariée pour chaque variable démographique
 for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
