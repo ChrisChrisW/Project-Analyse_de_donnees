@@ -8,6 +8,24 @@ output:
     toc: true
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
+```
+
+```{r, message=FALSE, echo=FALSE}
+# Chargement des données
+library(ggplot2)
+library(skimr)
+library(VIM)
+library(outliers)
+library(psych)
+library(corrplot)
+library(cluster)
+
+# Chargement des données
+tab <- read.csv(file = "./data/credit-card-customers/cleaned_data.csv", sep = ',', dec = '.', header = TRUE)
+```
+
 \newpage
 
 # Introduction
@@ -48,24 +66,6 @@ Les données ont été préalablement traitées, et vous pouvez vous référer a
     -   **Question :** Peut-on classer les clients en groupes distincts en fonction de leurs comportements et caractéristiques, en particulier en ce qui concerne la résiliation?
     -   **Méthodologie :** Utilisation de méthodes de classification.
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.width = 10, fig.height = 6, fig.align='center')
-```
-
-
-```{r, message=FALSE, echo=FALSE}
-# Chargement des données
-library(ggplot2)
-library(skimr)
-library(VIM)
-library(outliers)
-library(psych)
-library(corrplot)
-library(cluster)
-
-# Chargement des données
-tab <- read.csv(file = "./data/credit-card-customers/cleaned_data.csv", sep = ',', dec = '.', header = TRUE)
-```
 
 
 # Objectif 1: Compréhension des caractéristiques démographiques
@@ -86,38 +86,9 @@ L'objectif de cette première phase d'analyse est de comprendre les profils dém
 
 6. **Income_Category (Catégorie de revenu) :** Les disparités de revenus peuvent façonner les décisions financières. Nous avons intégré cette variable pour son rôle présumé dans la compréhension des variations de résiliation selon les catégories de revenus.
 
-## Sortie statistique :
-
-### En valeurs brutes :
-
-```{r, echo=FALSE}
-# Profils démographiques des clients résiliant leurs services de cartes de crédit
-par(mfrow = c(2, 3))
-
-# Analyse univariée pour chaque variable démographique
-for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
-  barplot(table(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
-}
-```
-
-### en pourcentage :
-
-```{r, echo=FALSE}
-# Profils démographiques des clients résiliant leurs services de cartes de crédit
-par(mfrow = c(2, 3))
-
-# Calcul des pourcentages
-calculate_percentage <- function(x, y) {
-  return(prop.table(table(x, y), margin = 1) * 100)
-}
-
-# Analyse univariée pour chaque variable démographique
-for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
-  barplot(calculate_percentage(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
-}
-```
-
 ## Analyse
+
+Dans l'annexe (voir Partie Annexe : \nameref{annexe:demographiques}), vous trouverez des résultats détaillés comprenant des barplots illustrant visuellement les profils démographiques des clients résiliant leurs services de cartes de crédit pour chaque variable démographique. Cette section fournira une analyse détaillée de ces barplots, présentant ainsi une représentation graphique des distributions et des tendances démographiques associées à la résiliation des services de cartes de crédit.
 
 1. **Customer_Age (Age du client) :** La distribution par âge révèle que la majorité des clients résiliants ont entre 40 et 50 ans, avec une concentration significative également dans la tranche de 50 à 60 ans. En revanche, les clients existants sont répartis sur une gamme plus large d'âges, avec une concentration relativement élevée dans la tranche de 40 à 50 ans. Il est essentiel de prendre en compte cette répartition lors de l'analyse des profils démographiques.
 
@@ -503,3 +474,46 @@ Cette étude approfondie visait à répondre à la problématique centrale : "Qu
 **Ouverture vers des Études Futures :** Cette étude constitue une base pour approfondir la compréhension des motifs de résiliation des services de cartes de crédit. Des investigations futures pourraient se concentrer sur des aspects spécifiques, notamment l'impact des programmes de fidélisation, l'influence des canaux de communication sur la rétention, ou encore l'exploration des facteurs psychologiques liés à la décision de résilier. En explorant ces domaines, les chercheurs pourraient apporter des éclairages supplémentaires, contribuant ainsi à affiner davantage les stratégies de rétention des institutions financières.
 
 Cette investigation vise à guider les décisions futures des institutions financières en fournissant des perspectives sur les dynamiques de résiliation des services de cartes de crédit. Les "insights" ou résultats obtenus peuvent servir de fondement pour des stratégies de rétention plus efficaces et une adaptation continue aux besoins changeants des clients.
+
+
+\newpage
+
+# Partie Annexe
+
+## Analyses Démographiques
+\label{annexe:demographiques}
+
+Cette annexe détaille les résultats de l'analyse des caractéristiques démographiques des clients ayant résilié leurs services de cartes de crédit. Les graphiques ci-dessous illustrent visuellement les profils démographiques en relation avec la résiliation des services.
+
+### Profils démographiques en valeurs brutes
+
+```{r, echo=FALSE}
+# Profils démographiques des clients résiliant leurs services de cartes de crédit
+par(mfrow = c(2, 3))
+
+# Analyse univariée pour chaque variable démographique
+for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
+  barplot(table(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
+}
+```
+
+Les graphiques ci-dessus présentent la distribution des clients résiliant leurs services de cartes de crédit en fonction de différentes variables démographiques.
+
+### Profils démographiques en pourcentage
+
+```{r, echo=FALSE}
+# Profils démographiques des clients résiliants leurs services de cartes de crédit en pourcentage
+par(mfrow = c(2, 3))
+
+# Calcul des pourcentages
+calculate_percentage <- function(x, y) {
+  return(prop.table(table(x, y), margin = 1) * 100)
+}
+
+# Analyse univariée pour chaque variable démographique
+for (var in c("Customer_Age", "Gender", "Dependent_count", "Education_Level", "Marital_Status", "Income_Category")) {
+  barplot(calculate_percentage(tab$Attrition_Flag, tab[[var]]), main = var, col = c("skyblue", "lightblue"), legend.text = TRUE)
+}
+```
+
+Les graphiques en pourcentage ci-dessus offrent une perspective plus détaillée, mettant en évidence la répartition relative des clients résiliant leurs services de cartes de crédit selon chaque variable démographique.
