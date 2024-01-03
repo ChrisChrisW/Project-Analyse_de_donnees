@@ -1,0 +1,59 @@
+\contentsline {section}{Introduction}{3}{section*.2}%
+\contentsline {subsection}{Source des données :}{3}{section*.3}%
+\contentsline {subsection}{Outils Utilisés :}{3}{section*.4}%
+\contentsline {subsection}{Problématique :}{3}{section*.5}%
+\contentsline {subsection}{Objectifs :}{3}{section*.6}%
+\contentsline {section}{Objectif 1: Compréhension des caractéristiques démographiques}{4}{section*.7}%
+\contentsline {subsection}{Justification des choix de variables :}{4}{section*.8}%
+\contentsline {subsection}{Analyse :}{4}{section*.9}%
+\contentsline {section}{Objectif 2: Étude des relations entre les variables}{6}{section*.10}%
+\contentsline {subsection}{Justification des choix de variables :}{6}{section*.11}%
+\contentsline {subsection}{Matrice de corrélation :}{6}{section*.12}%
+\contentsline {subsubsection}{Interprétation des résultats :}{6}{section*.13}%
+\contentsline {subsection}{Test de corrélation :}{7}{section*.14}%
+\contentsline {subsubsection}{Interprétation des résultats :}{7}{section*.15}%
+\contentsline {section}{Objectif 3: Facteurs sous-jacents à la résiliation}{9}{section*.16}%
+\contentsline {subsection}{Justification des choix de variables :}{9}{section*.17}%
+\contentsline {subsection}{Analyse factorielle - Interprétation des facteurs (MR1 et MR2) :}{9}{section*.18}%
+\contentsline {subsubsection}{Nombre de facteurs :}{9}{section*.19}%
+\contentsline {subsection}{Interprétation des facteurs :}{9}{section*.20}%
+\contentsline {subsection}{Facteurs sous-jacents à la décision de résilier :}{10}{section*.21}%
+\contentsline {section}{Objectif 4: Modélisation prédictive}{11}{section*.22}%
+\contentsline {subsection}{Justification des choix de variables :}{11}{section*.23}%
+\contentsline {subsection}{Modèle de régression logistique :}{11}{section*.24}%
+\contentsline {subsubsection}{Transformation de la variable cible :}{11}{section*.25}%
+\contentsline {subsubsection}{Sortie statistique :}{11}{section*.26}%
+\contentsline {subsubsection}{Interception (constante) significative :}{11}{section*.27}%
+\contentsline {subsubsection}{Variables explicatives :}{12}{section*.28}%
+\contentsline {subsubsection}{Performance du modèle :}{12}{section*.29}%
+\contentsline {section}{Objectif 5: Classification des clients}{13}{section*.30}%
+\contentsline {subsection}{Nombre Optimal de Clusters:}{13}{section*.31}%
+\contentsline {subsubsection}{Méthode du Coude:}{13}{section*.32}%
+\contentsline {subsubsection}{Méthode de la Silhouette:}{13}{section*.33}%
+\contentsline {subsection}{Résultats de la Classification :}{13}{section*.34}%
+\contentsline {subsubsection}{Interprétation :}{13}{section*.35}%
+\contentsline {subsubsection}{Évaluation de la Classification :}{14}{section*.36}%
+\contentsline {subsubsection}{Utilisation des Résultats :}{14}{section*.37}%
+\contentsline {section}{Conclusion}{15}{section*.38}%
+\contentsline {section}{Partie Annexe}{17}{section*.39}%
+\contentsline {subsection}{1 - Compréhension des caractéristiques démographiques}{17}{section*.40}%
+\contentsline {subsubsection}{Profils démographiques}{17}{section*.41}%
+\contentsline {paragraph}{En valeurs brutes}{17}{section*.42}%
+\contentsline {paragraph}{En pourcentage}{20}{section*.43}%
+\contentsline {subsection}{2 - Étude des relations entre les variables}{24}{section*.44}%
+\contentsline {subsubsection}{Matrice corrélation}{24}{section*.45}%
+\contentsline {subsubsection}{Test corrélation}{25}{section*.46}%
+\contentsline {subsection}{3 - Facteurs sous-jacents à la résiliation}{26}{section*.47}%
+\contentsline {subsubsection}{Nombre de facteurs}{26}{section*.48}%
+\contentsline {subsubsection}{Facteurs}{26}{section*.49}%
+\contentsline {subsection}{4 - Modélisation prédictive}{27}{section*.50}%
+\contentsline {subsubsection}{Transformation de la variable cible}{27}{section*.51}%
+\contentsline {subsubsection}{Modèle de régression logistique}{27}{section*.52}%
+\contentsline {subsection}{5 - Classification des clients}{28}{section*.53}%
+\contentsline {subsubsection}{Nombre optimal de clusters}{28}{section*.54}%
+\contentsline {paragraph}{Méthode du Coude}{28}{section*.55}%
+\contentsline {paragraph}{Méthode de la Silhouette}{29}{section*.56}%
+\contentsline {subsubsection}{Résultat de la classification}{30}{section*.57}%
+\contentsline {subsubsection}{Graphiques k-means}{31}{section*.58}%
+\contentsline {paragraph}{Avec les points de données}{31}{section*.59}%
+\contentsline {paragraph}{Sans les points de données}{32}{section*.60}%
